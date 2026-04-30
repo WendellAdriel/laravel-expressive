@@ -1,5 +1,5 @@
 ---
-name: expressive
+name: expressive-development
 description: >
   Configure and apply the Expressive package in Laravel applications.
 license: MIT
