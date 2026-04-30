@@ -1,19 +1,19 @@
 ---
-name: skeleton
+name: expressive
 description: >
-  Configure and apply the :package_name package in Laravel applications.
+  Configure and apply the Expressive package in Laravel applications.
 license: MIT
 metadata:
-  author: :author_name
+  author: Wendell Adriel
 ---
 
-# :package_name
+# Expressive
 
-Use this skill when a Laravel application needs to integrate the :package_name package.
+Use this skill when a Laravel application needs to integrate the Expressive package.
 
 ## Primary Goal
 
-- apply the `:vendor_slug/:package_slug` package's public API in the smallest correct way
+- apply the `wendelladriel/expressive` package's public API in the smallest correct way
 
 ## Workflow
 
@@ -24,7 +24,7 @@ Use this skill when a Laravel application needs to integrate the :package_name p
 
 ### 2. Apply the package's public API
 
-Document how to integrate :package_name here, replacing this placeholder with the integration steps for your package.
+Document how to integrate Expressive here, replacing this placeholder with the integration steps for your package.
 
 ## Rules, References, and Templates
 
@@ -34,7 +34,7 @@ Read before executing:
 
 ## Examples
 
-- describe a representative integration scenario for :package_name
+- describe a representative integration scenario for Expressive
 
 ## Anti-patterns
 

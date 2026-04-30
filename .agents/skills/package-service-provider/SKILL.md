@@ -32,7 +32,7 @@ Wire package capabilities through explicit Laravel service provider code without
 
 ## Examples
 
-- Wire a new publish tag by adding a `publishes` map inside the existing console-guarded publishing method and naming the tag with `:package_slug-*`.
+- Wire a new publish tag by adding a `publishes` map inside the existing console-guarded publishing method and naming the tag with `expressive-*`.
 - Add a command by creating the command class, importing it in the provider, and adding it to the `commands` array inside the `runningInConsole()` guard.
 
 ## Anti-Patterns

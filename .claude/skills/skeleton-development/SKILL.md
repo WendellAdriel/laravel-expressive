@@ -1,12 +1,12 @@
 ---
-name: skeleton-development
-description: "Use this skill when changing this Laravel package skeleton repository itself: placeholders, configure flow, starter defaults, root guidance, local skills, temporary phase tests, dist hygiene, or scaffold-wide conventions. Do not use for ordinary package feature work after a package has been configured."
+name: expressive-development
+description: "Use this skill when changing this Laravel package expressive repository itself: placeholders, configure flow, starter defaults, root guidance, local skills, temporary phase tests, dist hygiene, or scaffold-wide conventions. Do not use for ordinary package feature work after a package has been configured."
 license: MIT
 metadata:
   author: laravel
 ---
 
-# Skeleton Development
+# Expressive Development
 
 ## Primary Goal
 
@@ -14,8 +14,8 @@ Evolve the starter kit without making it less useful for future package authors.
 
 ## Workflow
 
-1. Preserve generic placeholders such as `:author_name`, `:package_name`, `:vendor_slug`, and `:package_slug` until the configure flow replaces them.
-2. Keep starter guidance minimal and split skeleton-maintenance rules from package-author rules.
+1. Preserve generic placeholders such as `Wendell Adriel`, `Expressive`, `wendelladriel`, and `expressive` until the configure flow replaces them.
+2. Keep starter guidance minimal and split expressive-maintenance rules from package-author rules.
 3. Use temporary phase scaffold tests when proving repository shape, file parity, or generated scaffolding; delete those tests before final validation.
 4. Keep `.claude/skills` and `.agents/skills` mirrored when adding or editing local skills.
 5. Keep `configure.php` feature and tool pruning maps aligned with the service provider, Composer metadata, README sections, docs, AI guidance, skills, and publishable files.
@@ -41,6 +41,6 @@ Evolve the starter kit without making it less useful for future package authors.
 ## Anti-Patterns
 
 - Leaving temporary phase tests in the shipped starter suite.
-- Putting skeleton-maintenance rules into package-facing skills.
+- Putting expressive-maintenance rules into package-facing skills.
 - Replacing placeholders with one real package name in starter files.
 - Adding runtime dependencies for repository-maintenance convenience.

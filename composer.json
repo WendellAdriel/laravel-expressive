@@ -1,18 +1,18 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "vendor-name/skeleton",
-    "description": "A Laravel package skeleton.",
+    "name": "wendelladriel/expressive",
+    "description": "A Data Mapper layer on top of Eloquent",
     "keywords": [
-        "vendor-name",
+        "wendelladriel",
         "laravel",
-        "skeleton"
+        "expressive"
     ],
-    "homepage": "https://github.com/vendor-name/skeleton",
+    "homepage": "https://github.com/wendelladriel/expressive",
     "license": "MIT",
     "authors": [
         {
-            "name": "Author Name",
-            "email": "author@example.com",
+            "name": "Wendell Adriel",
+            "email": "wendelladriel.ti@gmail.com",
             "role": "Developer"
         }
     ],
@@ -24,7 +24,6 @@
     "require-dev": {
         "larastan/larastan": "^3.9",
         "laravel/pint": "^1.29",
-        "laravel/prompts": "^0.3",
         "nunomaduro/pao": "^1.0",
         "orchestra/testbench": "^10.0||^11.0",
         "pestphp/pest": "^4.6",
@@ -34,22 +33,18 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/"
+            "WendellAdriel\\Expressive\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/",
+            "WendellAdriel\\Expressive\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/",
             "Workbench\\Database\\Factories\\": "workbench/database/factories/",
             "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
         }
     },
     "scripts": {
-        "setup": [
-            "composer install",
-            "@php configure.php"
-        ],
         "post-autoload-dump": [
             "@clear",
             "@prepare",
@@ -94,10 +89,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "WendellAdriel\\Expressive\\ExpressiveServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "Expressive": "WendellAdriel\\Expressive\\Facades\\Expressive"
             }
         }
     },

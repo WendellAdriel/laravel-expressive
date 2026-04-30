@@ -1,13 +1,13 @@
-# Package Skeleton
+# Package Expressive
 
-This repository is a Laravel package skeleton for building new packages. Preserve idiomatic Laravel package patterns, keep placeholders generic, and prefer the smallest package-specific change that keeps the skeleton useful after configuration.
+This repository is a Laravel package expressive for building new packages. Preserve idiomatic Laravel package patterns, keep placeholders generic, and prefer the smallest package-specific change that keeps the expressive useful after configuration.
 
 ## Package Conventions
 
 - Use Laravel-native package APIs and the existing service provider shape before adding abstractions.
-- Keep `:author_name`, `:package_name`, `:vendor_slug`, and `:package_slug` placeholders intact until the package is configured.
+- Keep `Wendell Adriel`, `Expressive`, `wendelladriel`, and `expressive` placeholders intact until the package is configured.
 - Treat `configure.php` as a one-time bootstrap script: package authors run `composer install` and then `php ./configure.php` to replace placeholders, prune disabled features/tools, optionally create a GitHub repository, and delete the script after success.
-- When changing package capabilities or maintenance tooling in the skeleton, keep the configure feature/tool mappings in sync with files, Composer metadata, README copy, AI guidance, and local skills.
+- When changing package capabilities or maintenance tooling in the expressive, keep the configure feature/tool mappings in sync with files, Composer metadata, README copy, AI guidance, and local skills.
 - Do not add runtime dependencies, generated files, or extra scaffold unless the package feature needs them.
 - Keep temporary phase scaffold tests out of the final shipped test suite.
 
@@ -29,4 +29,4 @@ This repository is a Laravel package skeleton for building new packages. Preserv
 - `package-compatibility`: use when reviewing code, dependencies, or CI against the PHP and Laravel support matrix.
 - `package-docs`: use when writing README, MkDocs, contributing, upgrade, or usage documentation.
 - `package-generate-skill`: use when updating the bundled Boost skill from the package implementation and docs.
-- `skeleton-development`: use when changing this skeleton repository itself, including placeholders, configure flow, temporary phase tests, or scaffold-wide conventions.
+- `expressive-development`: use when changing this expressive repository itself, including placeholders, configure flow, temporary phase tests, or scaffold-wide conventions.

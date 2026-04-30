@@ -1,15 +1,15 @@
 # Installation
 
-Install :package_name into a Laravel application with Composer:
+Install Expressive into a Laravel application with Composer:
 
 ```bash
-composer require :vendor_slug/:package_slug
+composer require wendelladriel/expressive
 ```
 
 Publish the package resources with the umbrella tag:
 
 ```bash
-php artisan vendor:publish --tag=":package_slug"
+php artisan vendor:publish --tag="expressive"
 ```
 
 If the package ships migrations, run them after publishing:
@@ -18,4 +18,4 @@ If the package ships migrations, run them after publishing:
 php artisan migrate
 ```
 
-Update this page with any configuration, environment variables, or install checks that :package_name requires.
+Update this page with any configuration, environment variables, or install checks that Expressive requires.

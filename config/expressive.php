@@ -11,7 +11,7 @@ return [
     |
     | This value is a packaged default that demonstrates how host applications
     | can override the configuration after merging. Replace this block when
-    | you evolve the skeleton into your own package.
+    | you evolve the expressive into your own package.
     |
     */
 

@@ -1,6 +1,6 @@
 # Testing
 
-Run the full :package_name validation suite with Composer:
+Run the full Expressive validation suite with Composer:
 
 ```bash
 composer test
@@ -15,7 +15,7 @@ composer test:types
 composer test:unit
 ```
 
-Use the bundled workbench when :package_slug needs to be exercised inside a real Laravel application:
+Use the bundled workbench when expressive needs to be exercised inside a real Laravel application:
 
 ```bash
 composer build

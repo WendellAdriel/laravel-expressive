@@ -41,7 +41,7 @@ Keep package docs concise, accurate, and useful for developers installing, confi
 
 ## Examples
 
-- Add installation docs that show `composer require :vendor_slug/:package_slug`, publish tags, and migration steps when relevant.
+- Add installation docs that show `composer require wendelladriel/expressive`, publish tags, and migration steps when relevant.
 - Add usage, testing, and workbench docs that explain how to run `composer test`, `composer build`, and `composer serve` without over-documenting internals.
 
 ## Anti-Patterns

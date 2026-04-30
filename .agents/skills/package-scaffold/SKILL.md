@@ -34,7 +34,7 @@ Add package features in the right place while keeping package names, namespaces,
 ## Examples
 
 - Add an Artisan command: create the command class under `src/Console/Commands`, register it in the provider, add a feature test for observable console output, and document the command if it is user-facing.
-- Add a publishable migration: place the migration in `database/migrations`, wire it through the provider with a `:package_slug-migrations` tag, and test publish behavior with Testbench.
+- Add a publishable migration: place the migration in `database/migrations`, wire it through the provider with a `expressive-migrations` tag, and test publish behavior with Testbench.
 
 ## Anti-Patterns
 

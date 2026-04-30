@@ -1,13 +1,13 @@
-# :package_name
+# Expressive
 
-:package_description
+A Data Mapper layer on top of Eloquent
 
-Use these docs as the long-form home for :package_name. Keep the README focused on quick installation and link here for guides, examples, and maintenance notes.
+Use these docs as the long-form home for Expressive. Keep the README focused on quick installation and link here for guides, examples, and maintenance notes.
 
 ## Package
 
-- Composer package: `:vendor_slug/:package_slug`
-- Publish tag: `:package_slug`
+- Composer package: `wendelladriel/expressive`
+- Publish tag: `expressive`
 
 ## Next Steps
 

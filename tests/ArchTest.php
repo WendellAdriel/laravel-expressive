@@ -11,5 +11,5 @@ arch('it will not use dd(), ddd(), env(), or exit()')
     ->each->not->toBeUsed();
 
 arch('the package source declares strict types')
-    ->expect('VendorName\Skeleton')
+    ->expect('WendellAdriel\Expressive')
     ->toUseStrictTypes();

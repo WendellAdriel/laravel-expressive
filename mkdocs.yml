@@ -1,8 +1,8 @@
-site_name: :package_name
-site_description: :package_description
-site_url: https://:vendor_slug.github.io/:package_slug
-repo_url: https://github.com/:vendor_slug/:package_slug
-repo_name: :vendor_slug/:package_slug
+site_name: Expressive
+site_description: A Data Mapper layer on top of Eloquent
+site_url: https://wendelladriel.github.io/expressive
+repo_url: https://github.com/wendelladriel/expressive
+repo_name: wendelladriel/expressive
 
 theme:
   # Customize Material for MkDocs: https://squidfunk.github.io/mkdocs-material/setup/changing-the-colors/
