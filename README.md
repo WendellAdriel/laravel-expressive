@@ -1,6 +1,9 @@
 <div align="center">
-    <h1>Expressive</h1>
-    A Data Mapper layer on top of Eloquent
+    <img src="https://github.com/wendelladriel/expressive/raw/main/art/logo.png" alt="Expressive" height="300"/>
+    <p>
+        <h1>Expressive</h1>
+        A Data Mapper layer on top of Eloquent
+    </p>
 </div>
 
 <p align="center">

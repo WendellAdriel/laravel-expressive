@@ -16,3 +16,4 @@
 /.agents            export-ignore
 /CLAUDE.md          export-ignore
 /AGENTS.md          export-ignore
+/art                export-ignore
