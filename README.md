@@ -14,8 +14,6 @@
     <a href="https://packagist.org/packages/wendelladriel/expressive"><img src="https://img.shields.io/packagist/dt/wendelladriel/expressive.svg?style=flat-square" alt="Total Downloads"></a>
 </p>
 
-A Data Mapper layer on top of Eloquent
-
 ## Installation
 
 You can install the package via composer:
@@ -24,18 +22,10 @@ You can install the package via composer:
 composer require wendelladriel/expressive
 ```
 
-You can publish all of the package's resources at once using the umbrella tag:
+You can publish the config file with:
 
 ```bash
 php artisan vendor:publish --tag="expressive"
-```
-
-Alternatively, you can publish each resource individually using the tags below.
-
-### Publishing the Configuration File
-
-```bash
-php artisan vendor:publish --tag="expressive-config"
 ```
 
 ## Usage
