@@ -7,9 +7,13 @@ namespace WendellAdriel\Expressive;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+use JsonException;
 use JsonSerializable;
 use WendellAdriel\Expressive\Actions\ExpressiveMetadata;
 use WendellAdriel\Expressive\DTOs\PropertyMetadata;
+use WendellAdriel\Expressive\Exceptions\JsonEncodingException;
 use WendellAdriel\Expressive\Support\ClassResolver;
 use WendellAdriel\Expressive\Support\ExpressiveMapper;
 
@@ -69,10 +73,19 @@ abstract class Expressive implements Arrayable, JsonSerializable
                 continue;
             }
 
-            $values[$metadata->name] = $this->arrayValue($metadata->property->getValue($this));
+            $values[$this->serializationKey($metadata->name)] = $this->arrayValue($metadata->property->getValue($this));
         }
 
         return $values;
+    }
+
+    public function toJson(int $options = 0): string
+    {
+        try {
+            return json_encode($this->jsonSerialize(), $options | JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            throw JsonEncodingException::forExpressive($this::class, $exception);
+        }
     }
 
     public function jsonSerialize(): mixed
@@ -91,6 +104,17 @@ abstract class Expressive implements Arrayable, JsonSerializable
         }
 
         return $value;
+    }
+
+    private function serializationKey(string $key): string
+    {
+        $case = config('expressive.serialization.case', 'preserve');
+
+        return match ($case) {
+            'preserve' => $key,
+            'snake' => Str::snake($key),
+            default => throw new InvalidArgumentException("Unsupported expressive serialization.case [{$case}]."),
+        };
     }
 
     private function serializationModel(): Model

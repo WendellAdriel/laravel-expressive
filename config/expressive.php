@@ -44,4 +44,37 @@ return [
         'throw_on_unfillable' => false,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Serialization
+    |--------------------------------------------------------------------------
+    |
+    | Expressive serializes public property names by default. Applications that
+    | prefer Laravel-style response keys may opt in to snake-case output while
+    | keeping metadata lookups based on the mapped Eloquent keys. Supported
+    | values are: preserve, snake.
+    |
+    */
+
+    'serialization' => [
+        'case' => 'preserve',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Generator Defaults
+    |--------------------------------------------------------------------------
+    |
+    | These values are used by make:expressive when the matching CLI option is
+    | omitted. Explicit CLI flags always take precedence for a single run.
+    |
+    */
+
+    'generator' => [
+        'with_attributes' => true,
+        'with_relationships' => true,
+        'exclude_hidden' => false,
+        'hint_morph_map' => false,
+    ],
+
 ];

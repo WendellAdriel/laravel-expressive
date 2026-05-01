@@ -69,3 +69,28 @@ $saved = (new App\Expressive\User([
 
 expect($saved->exists)->toBeTrue();
 ```
+
+## Serialization Assertions
+
+Assert the public boundary you return from your application, including hidden fields and configured key casing:
+
+```php
+config(['expressive.serialization.case' => 'snake']);
+
+expect($user->toArray())
+    ->toHaveKey('email_verified_at')
+    ->not->toHaveKey('remember_key');
+
+expect($user->toJson())->toBe(json_encode($user->toArray(), JSON_THROW_ON_ERROR));
+```
+
+## Drift Assertions
+
+Use `expressive:sync` in adoption tests or CI checks when generated Expressive classes should track Eloquent model shape:
+
+```php
+$this->artisan('expressive:sync User --model="App\Models\User"')
+    ->assertSuccessful();
+```
+
+Run `expressive:sync --write` only when you expect a safely generated class to be updated. If the command refuses a rewrite, update the class manually or regenerate it after reviewing user edits.

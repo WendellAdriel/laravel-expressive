@@ -96,6 +96,7 @@ Expressive objects implement `Arrayable` and `JsonSerializable`:
 
 ```php
 $array = $user->toArray();
+$json = $user->toJson();
 $json = json_encode($user);
 ```
 
@@ -103,20 +104,21 @@ Serialization uses initialized public Expressive property names as keys, includi
 
 Expressive serialization applies the mapped Eloquent model's `hidden` and `visible` rules using the underlying model attribute or relationship key. For example, a property mapped with `#[Map('remember_token')]` is omitted when `remember_token` is hidden on the model, even though the serialized key would otherwise be `rememberKey`.
 
-Expressive serialization does not replace API resources or automatically append unavailable accessors. Wrap Expressive objects in resources explicitly when you need an API-specific shape:
+`toJson()` encodes the same filtered array representation and accepts normal JSON encoding options:
 
 ```php
-final class UserResource extends JsonResource
-{
-    public function toArray(Request $request): array
-    {
-        return [
-            'name' => $this->resource->name,
-            'posts' => $this->resource->posts?->map->toArray(),
-        ];
-    }
-}
+$json = $user->toJson(JSON_PRETTY_PRINT);
 ```
+
+Set `expressive.serialization.case` to `snake` when API responses should use snake-case keys. The default is `preserve`, and filtering still uses the mapped Eloquent keys:
+
+```php
+'serialization' => [
+    'case' => 'snake',
+],
+```
+
+Expressive serialization does not replace API resources or automatically append unavailable accessors. Keep API-specific response shapes in your application layer.
 
 ## Expressive to Eloquent
 
@@ -181,14 +183,37 @@ Useful options:
 
 - `--namespace="App\Data"`
 - `--suffix="Expressive"`
+- `--with-attributes`
 - `--without-attributes`
 - `--attributes="name,email,display_name"`
+- `--with-relationships`
 - `--without-relationships`
 - `--relationships="posts,address"`
+- `--include-hidden`
 - `--exclude-hidden`
+- `--hint-morph-map`
 - `--dry-run`
 - `--force`
+
+Use `expressive:sync` to validate an existing Expressive class against the current model shape:
+
+```bash
+php artisan expressive:sync User --model="App\Models\User"
+```
+
+The command reports missing attributes, stale properties, relationship drift, and invalid generated types. It never changes files unless `--write` is passed. Write mode only rewrites when the class appears safely generated; otherwise it fails with an actionable message.
 
 ## Configuration
 
 The generator inspects the model table, casts, relationships, and accessors to create public properties with the needed Expressive attributes.
+
+Project-wide generator defaults live under `expressive.generator` and are overridden by explicit CLI flags for a single run:
+
+```php
+'generator' => [
+    'with_attributes' => true,
+    'with_relationships' => true,
+    'exclude_hidden' => false,
+    'hint_morph_map' => false,
+],
+```

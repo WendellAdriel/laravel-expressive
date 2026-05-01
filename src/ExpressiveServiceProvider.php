@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use InvalidArgumentException;
 use WendellAdriel\Expressive\Console\Commands\MakeExpressiveCommand;
+use WendellAdriel\Expressive\Console\Commands\SyncExpressiveCommand;
 use WendellAdriel\Expressive\Support\ExpressiveMapper;
 
 final class ExpressiveServiceProvider extends ServiceProvider
@@ -50,6 +51,7 @@ final class ExpressiveServiceProvider extends ServiceProvider
 
         $this->commands([
             MakeExpressiveCommand::class,
+            SyncExpressiveCommand::class,
         ]);
     }
 

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -23,7 +24,7 @@ final readonly class ExpressiveClassBuilder
     public function __construct(private CastTypeResolver $castTypeResolver) {}
 
     /**
-     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool}  $options
+     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool, hint_morph_map?: bool}  $options
      */
     public function handle(string $stub, string $namespace, string $class, Model $model, array $options = []): string
     {
@@ -45,7 +46,7 @@ final readonly class ExpressiveClassBuilder
     }
 
     /**
-     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool}  $options
+     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool, hint_morph_map?: bool}  $options
      * @return array{imports: string, properties: string}
      */
     private function propertiesFor(string $namespace, Model $model, array $options): array
@@ -73,7 +74,7 @@ final readonly class ExpressiveClassBuilder
         }
 
         foreach ($this->filteredRelationshipsFor($model, $options) as $relationship) {
-            $properties[] = $this->relationshipProperty($namespace, $relationship, $imports);
+            $properties[] = $this->relationshipProperty($namespace, $model, $relationship, $imports, (bool) ($options['hint_morph_map'] ?? false));
         }
 
         foreach ($virtualAttributes as $attribute) {
@@ -147,7 +148,7 @@ final readonly class ExpressiveClassBuilder
     }
 
     /**
-     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool}  $options
+     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool, hint_morph_map?: bool}  $options
      * @return list<array{name: string, type: string, related: class-string<Model>|null}>
      */
     private function filteredRelationshipsFor(Model $model, array $options): array
@@ -179,7 +180,7 @@ final readonly class ExpressiveClassBuilder
     /**
      * @param  list<string>  $columns
      * @param  list<string>  $virtualAttributes
-     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool}  $options
+     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool, hint_morph_map?: bool}  $options
      * @return list<string>|null
      */
     private function selectedAttributesFor(Model $model, array $columns, array $virtualAttributes, array $options): ?array
@@ -208,14 +209,18 @@ final readonly class ExpressiveClassBuilder
      * @param  array{name: string, type: string, related: class-string<Model>|null}  $relationship
      * @param  array<int, string>  $imports
      */
-    private function relationshipProperty(string $namespace, array $relationship, array &$imports): string
+    private function relationshipProperty(string $namespace, Model $model, array $relationship, array &$imports, bool $hintMorphMap): string
     {
         $imports[] = 'WendellAdriel\\Expressive\\Attributes\\Relationship';
 
         if (is_a($relationship['type'], MorphTo::class, true)) {
             $imports[] = 'Illuminate\\Database\\Eloquent\\Model';
+            $types = $hintMorphMap ? $this->morphMapTypes($model, $relationship['name']) : [];
+            $phpDoc = $types === []
+                ? 'Expressive<Model>|null'
+                : implode('|', $types).'|Expressive<Model>|null';
 
-            return "    /** @var Expressive<Model>|null */\n    #[Relationship]\n    public ?Expressive $".$relationship['name'].' = null;';
+            return "    /** @var {$phpDoc} */\n    #[Relationship]\n    public ?Expressive $".$relationship['name'].' = null;';
         }
 
         /** @var class-string<Model> $related */
@@ -238,6 +243,63 @@ final readonly class ExpressiveClassBuilder
         }
 
         return "    #[Relationship]\n    public ?{$class} $".$relationship['name'].' = null;';
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function morphMapTypes(Model $model, string $morphName): array
+    {
+        $types = [];
+
+        foreach (Relation::morphMap() as $mappedModel) {
+            if (! is_subclass_of($mappedModel, Model::class)) {
+                continue;
+            }
+
+            if (! $this->hasConfidentMorphInverse($mappedModel, $model::class, $morphName)) {
+                continue;
+            }
+
+            $types[] = class_basename($mappedModel).(string) config('expressive.suffix', '');
+        }
+
+        return array_values(array_unique($types));
+    }
+
+    /**
+     * @param  class-string<Model>  $mappedModel
+     * @param  class-string<Model>  $targetModel
+     */
+    private function hasConfidentMorphInverse(string $mappedModel, string $targetModel, string $morphName): bool
+    {
+        $instance = new $mappedModel;
+        $reflection = new ReflectionClass($instance);
+
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            $returnType = $method->getReturnType();
+
+            if ($method->getNumberOfParameters() > 0 || ! $returnType instanceof ReflectionNamedType || ! is_subclass_of($returnType->getName(), Relation::class)) {
+                continue;
+            }
+
+            /** @var Relation<Model, Model, mixed> $relation */
+            $relation = $method->invoke($instance);
+
+            if (! $relation instanceof MorphOne && ! $relation instanceof MorphMany) {
+                continue;
+            }
+
+            if ($relation->getRelated()::class !== $targetModel) {
+                continue;
+            }
+
+            if (Str::beforeLast($relation->getMorphType(), '_type') === $morphName) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

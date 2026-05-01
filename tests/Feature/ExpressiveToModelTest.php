@@ -187,7 +187,7 @@ it('throws for unsupported belongs to many relationship persistence without writ
     ]);
 
     expect(fn () => $expressive->save())
-        ->toThrow(UnsupportedRelationshipPersistenceException::class, 'explicitly unsupported');
+        ->toThrow(UnsupportedRelationshipPersistenceException::class, 'does not support persisting');
 
     expect(DB::table('expressive_post_user')->count())->toBe(0);
 });
@@ -200,7 +200,7 @@ it('throws for unsupported morph to many relationship persistence without writin
     ]);
 
     expect(fn () => $expressive->save())
-        ->toThrow(UnsupportedRelationshipPersistenceException::class, 'explicitly unsupported');
+        ->toThrow(UnsupportedRelationshipPersistenceException::class, 'does not support persisting');
 
     expect(DB::table('expressive_taggables')->count())->toBe(0);
 });

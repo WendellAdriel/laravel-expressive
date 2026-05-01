@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use WendellAdriel\Expressive\Exceptions\UnsupportedGenerationException;
@@ -15,6 +16,7 @@ beforeEach(function (): void {
     File::deleteDirectory(app_path('Expressive'));
     File::deleteDirectory(app_path('Data'));
     File::deleteDirectory(base_path('stubs'));
+    Relation::morphMap([], false);
 });
 
 it('generates an expressive class from a model using default config', function (): void {
@@ -245,6 +247,170 @@ it('keeps hidden attribute generation by default', function (): void {
 
     expect($contents)->toContain('public ?string $password = null;')
         ->toContain('public ?string $rememberToken = null;');
+});
+
+it('uses generator config defaults for attributes', function (): void {
+    config()->set('expressive.generator.with_attributes', false);
+
+    Artisan::call('make:expressive', [
+        'name' => 'User',
+        '--model' => User::class,
+    ]);
+
+    $withoutAttributes = File::get(app_path('Expressive/User.php'));
+
+    expect($withoutAttributes)->not->toContain('public string $name;')
+        ->not->toContain('public ?string $displayName = null;');
+
+    config()->set('expressive.generator.with_attributes', true);
+
+    Artisan::call('make:expressive', [
+        'name' => 'User',
+        '--model' => User::class,
+        '--force' => true,
+    ]);
+
+    $withAttributes = File::get(app_path('Expressive/User.php'));
+
+    expect($withAttributes)->toContain('public string $name;')
+        ->toContain('public ?string $displayName = null;')
+        ->toContain('public string $email;');
+});
+
+it('lets explicit attribute cli flags override generator config defaults', function (): void {
+    config()->set('expressive.generator.with_attributes', false);
+
+    Artisan::call('make:expressive', [
+        'name' => 'User',
+        '--model' => User::class,
+        '--attributes' => 'name,email',
+    ]);
+
+    expect(File::get(app_path('Expressive/User.php')))->toContain('public string $name;')
+        ->toContain('public string $email;')
+        ->not->toContain('public ?int $id = null;');
+
+    Artisan::call('make:expressive', [
+        'name' => 'User',
+        '--model' => User::class,
+        '--force' => true,
+        '--with-attributes' => true,
+    ]);
+
+    expect(File::get(app_path('Expressive/User.php')))->toContain('public string $email;')
+        ->toContain('public ?int $id = null;');
+});
+
+it('uses generator config defaults for relationships', function (): void {
+    config()->set('expressive.generator.with_relationships', false);
+
+    Artisan::call('make:expressive', [
+        'name' => 'User',
+        '--model' => User::class,
+    ]);
+
+    expect(File::get(app_path('Expressive/User.php')))->not->toContain('#[Relationship]');
+
+    config()->set('expressive.generator.with_relationships', true);
+
+    Artisan::call('make:expressive', [
+        'name' => 'User',
+        '--model' => User::class,
+        '--force' => true,
+    ]);
+
+    $contents = File::get(app_path('Expressive/User.php'));
+
+    expect($contents)->toContain('public ?Address $address = null;')
+        ->toContain('/** @var Collection<int, Post>|null */')
+        ->toContain('public ?Address $firstPostAddress = null;');
+});
+
+it('lets explicit relationship cli flags override generator config defaults', function (): void {
+    config()->set('expressive.generator.with_relationships', false);
+
+    Artisan::call('make:expressive', [
+        'name' => 'User',
+        '--model' => User::class,
+        '--relationships' => 'posts',
+    ]);
+
+    expect(File::get(app_path('Expressive/User.php')))->toContain('/** @var Collection<int, Post>|null */')
+        ->not->toContain('public ?Address $address = null;');
+
+    Artisan::call('make:expressive', [
+        'name' => 'User',
+        '--model' => User::class,
+        '--force' => true,
+        '--with-relationships' => true,
+    ]);
+
+    expect(File::get(app_path('Expressive/User.php')))->toContain('public ?Address $address = null;');
+});
+
+it('uses generator hidden defaults and explicit hidden cli overrides', function (): void {
+    config()->set('expressive.generator.exclude_hidden', true);
+
+    Artisan::call('make:expressive', [
+        'name' => 'User',
+        '--model' => User::class,
+    ]);
+
+    expect(File::get(app_path('Expressive/User.php')))->not->toContain('public ?string $password = null;')
+        ->not->toContain('public ?string $rememberToken = null;');
+
+    Artisan::call('make:expressive', [
+        'name' => 'User',
+        '--model' => User::class,
+        '--force' => true,
+        '--include-hidden' => true,
+    ]);
+
+    expect(File::get(app_path('Expressive/User.php')))->toContain('public ?string $password = null;')
+        ->toContain('public ?string $rememberToken = null;');
+});
+
+it('adds morph map phpdoc hints only for confident mapped models', function (): void {
+    Relation::morphMap([
+        'post' => Post::class,
+        'user' => User::class,
+    ]);
+
+    Artisan::call('make:expressive', [
+        'name' => 'Image',
+        '--model' => Image::class,
+        '--hint-morph-map' => true,
+    ]);
+
+    $contents = File::get(app_path('Expressive/Image.php'));
+
+    expect($contents)->toContain('/** @var Post|Expressive<Model>|null */')
+        ->not->toContain('User|')
+        ->toContain('public ?Expressive $imageable = null;');
+});
+
+it('keeps broad morph map phpdoc hints when disabled or unresolved', function (): void {
+    Relation::morphMap([
+        'post' => Post::class,
+    ]);
+
+    Artisan::call('make:expressive', [
+        'name' => 'Image',
+        '--model' => Image::class,
+    ]);
+
+    expect(File::get(app_path('Expressive/Image.php')))->toContain('/** @var Expressive<Model>|null */');
+
+    Relation::morphMap([], false);
+
+    Artisan::call('make:expressive', [
+        'name' => 'Image',
+        '--model' => Image::class,
+        '--force' => true,
+        '--hint-morph-map' => true,
+    ]);
+
+    expect(File::get(app_path('Expressive/Image.php')))->toContain('/** @var Expressive<Model>|null */');
 });
 
 it('prints dry-run output without writing a file or requiring force', function (): void {

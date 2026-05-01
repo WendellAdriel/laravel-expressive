@@ -28,11 +28,13 @@ Use this skill when a Laravel application needs to integrate the Expressive pack
 - set `expressive.namespace` and `expressive.suffix` before relying on implicit class lookup or the generator
 - add `WendellAdriel\Expressive\Concerns\IsExpressive` to Eloquent models that should convert to typed objects
 - create Expressive classes under the configured namespace, or run `php artisan make:expressive User --model="App\Models\User"`
+- use `php artisan expressive:sync User --model="App\Models\User"` to detect drift, and add `--write` only for safe generated rewrites
 - use `#[Map]` for custom attribute keys, `#[Relationship]` for relationship properties, `#[Virtual]` for accessors/appended values, and `#[Model]` for explicit Expressive-to-model mapping
 - keep relationship and virtual properties nullable because unloaded relationships and unavailable accessors map to `null`
 - type single loaded relationships as the related Expressive class and document many relationships as `Collection<int, RelatedExpressive>|null`
 - use `$model->expressive()`, `$collection->expressive()`, or `$builder->expressive()` to convert from Eloquent
 - use `$expressive->model()` for in-memory Eloquent conversion and `$expressive->save()` for explicit persistence
+- use `$expressive->toArray()` or `$expressive->toJson()` for direct serialization, and set `expressive.serialization.case` to `snake` only when API keys should be snake case globally
 - keep deletion explicit through Eloquent, for example `$expressive->model()->delete()`
 
 ## Rules, References, and Templates
@@ -44,10 +46,11 @@ Read before executing:
 - `src/Expressive.php`
 - `src/Attributes/`
 - `src/Console/Commands/MakeExpressiveCommand.php`
+- `src/Console/Commands/SyncExpressiveCommand.php`
 
 ## Examples
 
-- generate `App\Expressive\User` from `App\Models\User`, add the `IsExpressive` trait to the model, then return `User::query()->expressive(relationships: ['posts'])` from an application service
+- generate `App\Expressive\User` from `App\Models\User`, add the `IsExpressive` trait to the model, validate it with `expressive:sync`, then return `User::query()->expressive(relationships: ['posts'])` from an application service
 - create a custom typed object with `#[Model(User::class)]`, hydrate it from validated input, call `$object->save()`, and let Eloquent persist fillable root attributes and supported relationships
 
 ## Anti-patterns
