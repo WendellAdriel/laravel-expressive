@@ -1,8 +1,8 @@
 site_name: Expressive
 site_description: A Data Mapper layer on top of Eloquent
-site_url: https://wendelladriel.github.io/expressive
-repo_url: https://github.com/wendelladriel/expressive
-repo_name: wendelladriel/expressive
+site_url: https://wendelladriel.github.io/laravel-expressive
+repo_url: https://github.com/wendelladriel/laravel-expressive
+repo_name: wendelladriel/laravel-expressive
 
 theme:
   # Customize Material for MkDocs: https://squidfunk.github.io/mkdocs-material/setup/changing-the-colors/

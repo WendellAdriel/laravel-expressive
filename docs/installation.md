@@ -3,7 +3,7 @@
 Install Expressive into a Laravel application with Composer:
 
 ```bash
-composer require wendelladriel/expressive
+composer require wendelladriel/laravel-expressive
 ```
 
 Publish the package resources with the umbrella tag:

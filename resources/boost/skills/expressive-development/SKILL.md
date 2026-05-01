@@ -13,7 +13,7 @@ Use this skill when a Laravel application needs to integrate the Expressive pack
 
 ## Primary Goal
 
-- apply the `wendelladriel/expressive` package's public API in the smallest correct way
+- apply the `wendelladriel/laravel-expressive` package's public API in the smallest correct way
 
 ## Workflow
 

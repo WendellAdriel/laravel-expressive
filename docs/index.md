@@ -6,7 +6,7 @@ Use these docs as the long-form home for Expressive. Keep the README focused on 
 
 ## Package
 
-- Composer package: `wendelladriel/expressive`
+- Composer package: `wendelladriel/laravel-expressive`
 - Publish tag: `expressive`
 
 ## Next Steps

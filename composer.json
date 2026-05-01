@@ -1,13 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "wendelladriel/expressive",
+    "name": "wendelladriel/laravel-expressive",
     "description": "A Data Mapper layer on top of Eloquent",
     "keywords": [
         "wendelladriel",
         "laravel",
         "expressive"
     ],
-    "homepage": "https://github.com/wendelladriel/expressive",
+    "homepage": "https://github.com/wendelladriel/laravel-expressive",
     "license": "MIT",
     "authors": [
         {
