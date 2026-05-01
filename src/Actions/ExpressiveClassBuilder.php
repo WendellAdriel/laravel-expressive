@@ -253,10 +253,6 @@ final readonly class ExpressiveClassBuilder
         $types = [];
 
         foreach (Relation::morphMap() as $mappedModel) {
-            if (! is_subclass_of($mappedModel, Model::class)) {
-                continue;
-            }
-
             if (! $this->hasConfidentMorphInverse($mappedModel, $model::class, $morphName)) {
                 continue;
             }
