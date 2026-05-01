@@ -54,30 +54,30 @@
             "@composer run prepare"
         ],
         "prepare": [
-            "@php vendor/bin/testbench package:discover --ansi"
+            "testbench package:discover --ansi"
         ],
         "build": [
-            "@php vendor/bin/testbench workbench:build --ansi"
+            "testbench workbench:build --ansi"
         ],
         "serve": [
             "Composer\\Config::disableProcessTimeout",
             "@build",
-            "@php vendor/bin/testbench serve --ansi"
+            "testbench serve --ansi"
         ],
         "lint": [
-            "vendor/bin/pint --parallel"
+            "pint --parallel"
         ],
         "lint:check": [
-            "vendor/bin/pint --parallel --test"
+            "pint --parallel --test"
         ],
         "analyse": [
-            "@php -d memory_limit=512M vendor/bin/phpstan analyse"
+            "phpstan analyse --memory-limit=512M"
         ],
         "test:types": [
-            "@php -d memory_limit=512M vendor/bin/pest --type-coverage --min=100"
+            "pest -d memory_limit=512M --type-coverage --min=100"
         ],
         "test:unit": [
-            "vendor/bin/pest --parallel"
+            "pest --parallel"
         ],
         "test": [
             "@analyse",
@@ -86,7 +86,7 @@
             "@test:unit"
         ],
         "clear": [
-            "@php vendor/bin/testbench package:purge-skeleton --ansi"
+            "testbench package:purge-skeleton --ansi"
         ]
     },
     "extra": {
