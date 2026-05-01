@@ -46,6 +46,10 @@ class User extends Expressive
     #[Relationship]
     public ?Collection $unsupportedPosts = null;
 
+    /** @var Collection<int, Comment>|null */
+    #[Relationship]
+    public ?Collection $comments = null;
+
     #[Virtual]
     public ?string $displayName = null;
 }

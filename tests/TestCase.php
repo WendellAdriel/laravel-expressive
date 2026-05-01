@@ -47,6 +47,18 @@ abstract class TestCase extends Orchestra
             $table->timestamps();
         });
 
+        Schema::create('expressive_comments', function (Blueprint $table): void {
+            $table->id();
+            $table->string('body');
+            $table->morphs('commentable');
+            $table->timestamps();
+        });
+
+        Schema::create('expressive_post_user', function (Blueprint $table): void {
+            $table->foreignId('user_id')->constrained('expressive_users')->cascadeOnDelete();
+            $table->foreignId('post_id')->constrained('expressive_posts')->cascadeOnDelete();
+        });
+
         Schema::create('expressive_images', function (Blueprint $table): void {
             $table->id();
             $table->string('url');
@@ -97,8 +109,18 @@ abstract class TestCase extends Orchestra
             $table->string('string_value')->nullable();
             $table->integer('timestamp_value')->nullable();
             $table->json('array_object_value')->nullable();
+            $table->json('encrypted_array_object_value')->nullable();
+            $table->json('enum_array_object_value')->nullable();
+            $table->json('enum_collection_value')->nullable();
+            $table->json('custom_collection_value')->nullable();
+            $table->json('collection_of_value_objects')->nullable();
+            $table->json('encrypted_custom_collection_value')->nullable();
+            $table->json('encrypted_collection_of_value_objects')->nullable();
             $table->string('enum_value')->nullable();
             $table->string('custom_value')->nullable();
+            $table->json('typed_custom_value')->nullable();
+            $table->json('malformed_custom_value')->nullable();
+            $table->json('castable_value')->nullable();
             $table->timestamps();
         });
     }

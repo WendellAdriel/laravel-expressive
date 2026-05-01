@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use WendellAdriel\Expressive\Concerns\IsExpressive;
 use WendellAdriel\Expressive\Tests\Fixtures\UserRole;
 
@@ -49,6 +51,16 @@ class User extends Model
     public function postAddresses(): HasManyThrough
     {
         return $this->hasManyThrough(Address::class, Post::class, 'user_id', 'user_id', 'id', 'user_id');
+    }
+
+    public function firstPostAddress(): HasOneThrough
+    {
+        return $this->hasOneThrough(Address::class, Post::class, 'user_id', 'user_id', 'id', 'user_id');
+    }
+
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 
     protected function displayName(): Attribute

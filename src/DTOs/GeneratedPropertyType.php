@@ -12,5 +12,6 @@ final readonly class GeneratedPropertyType
     public function __construct(
         public string $type,
         public array $imports = [],
+        public ?string $phpDocType = null,
     ) {}
 }

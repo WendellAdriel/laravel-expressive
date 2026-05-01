@@ -72,6 +72,52 @@ $users = User::query()->get()->expressive(relationships: ['posts']);
 
 Collection conversion uses collection-level `loadMissing()` for requested relationships.
 
+Calling `expressive()` on a builder executes `get()` immediately and returns an in-memory `Collection` of Expressive objects. For larger datasets, use `expressiveChunk()` to convert one Eloquent chunk at a time:
+
+```php
+User::query()->expressiveChunk(500, function (Collection $users): void {
+    foreach ($users as $user) {
+        // $user is an App\Expressive\User instance.
+    }
+}, relationships: ['posts']);
+```
+
+`expressiveChunk()` uses Laravel's builder `chunk()` method and converts each retrieved Eloquent collection with the same relationship and attribute options. You can also use Laravel's chunking APIs directly:
+
+```php
+User::query()->chunkById(500, fn ($users) => $users->expressive(relationships: ['posts']));
+```
+
+Cursor-based conversion is not provided because Laravel cursors cannot eager load relationships.
+
+## Serialization
+
+Expressive objects implement `Arrayable` and `JsonSerializable`:
+
+```php
+$array = $user->toArray();
+$json = json_encode($user);
+```
+
+Serialization uses initialized public Expressive property names as keys, including mapped property names like `rememberKey`. Nested Expressive objects and collections of Expressive objects are converted recursively. Uninitialized typed properties are skipped, and nullable relationship properties serialize as `null` when they were not loaded or assigned.
+
+Expressive serialization applies the mapped Eloquent model's `hidden` and `visible` rules using the underlying model attribute or relationship key. For example, a property mapped with `#[Map('remember_token')]` is omitted when `remember_token` is hidden on the model, even though the serialized key would otherwise be `rememberKey`.
+
+Expressive serialization does not replace API resources or automatically append unavailable accessors. Wrap Expressive objects in resources explicitly when you need an API-specific shape:
+
+```php
+final class UserResource extends JsonResource
+{
+    public function toArray(Request $request): array
+    {
+        return [
+            'name' => $this->resource->name,
+            'posts' => $this->resource->posts?->map->toArray(),
+        ];
+    }
+}
+```
+
 ## Expressive to Eloquent
 
 Use `model()` for in-memory conversion and `save()` for explicit persistence:
@@ -86,9 +132,42 @@ $model = $expressive->model();
 $saved = $expressive->save();
 ```
 
-`model()` fills only fillable, non-virtual, non-relationship properties and attaches relationship values in memory with `setRelation()`. `save()` saves the root model and supported `HasOne`, `BelongsTo`, and `HasMany` relationship values. Many-to-many and polymorphic persistence are intentionally unsupported in v1.
+`model()` fills only fillable, non-virtual, non-relationship properties and attaches relationship values in memory with `setRelation()`.
+
+`save()` saves the root model and only persists relationships that have direct, non-destructive Eloquent write semantics:
+
+| Relationship | `save()` persistence |
+|--------------|----------------------|
+| `BelongsTo` | Supported |
+| `HasOne` | Supported |
+| `MorphOne` | Supported |
+| `HasMany` | Supported |
+| `MorphMany` | Supported |
+| `BelongsToMany` | Unsupported |
+| `MorphToMany` / `morphedByMany()` | Unsupported |
+| `HasOneThrough` | Unsupported |
+| `HasManyThrough` | Unsupported |
+| Custom or future relation classes | Unsupported unless explicitly documented |
+
+Unsupported persistence does not mean unsupported conversion. Loaded or requested relationships can still be converted into Expressive properties when the class exposes them. The unsupported part is writing those relationships through `Expressive::save()`.
+
+Many-to-many persistence is intentionally unsupported until an explicit attach or sync API is designed. Through relationships are also unsupported for `save()` because the related records are reached through an intermediate model rather than a direct foreign key owned by the relationship target.
 
 Deletion is not provided on Expressive objects. Convert to an Eloquent model and call Eloquent deletion explicitly when needed.
+
+## Diagnostics
+
+By default, Expressive keeps Laravel's mass-assignment behavior conservative and silently ignores non-fillable mapped attributes during `model()` and `save()` conversion.
+
+Enable diagnostics when adopting Expressive in an existing application and you want unpersistable mapped properties to fail fast:
+
+```php
+'diagnostics' => [
+    'throw_on_unfillable' => true,
+],
+```
+
+This differs from Laravel's `preventSilentlyDiscardingAttributes()` because it runs against Expressive properties before the package calls `fill()`. Virtual properties and relationship properties are excluded from this diagnostic.
 
 ## Generator
 
@@ -102,6 +181,12 @@ Useful options:
 
 - `--namespace="App\Data"`
 - `--suffix="Expressive"`
+- `--without-attributes`
+- `--attributes="name,email,display_name"`
+- `--without-relationships`
+- `--relationships="posts,address"`
+- `--exclude-hidden`
+- `--dry-run`
 - `--force`
 
 ## Configuration

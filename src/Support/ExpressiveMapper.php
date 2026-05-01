@@ -9,12 +9,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Collection;
 use WendellAdriel\Expressive\Actions\ExpressiveMetadata;
 use WendellAdriel\Expressive\DTOs\PropertyMetadata;
 use WendellAdriel\Expressive\Exceptions\InvalidConversionValueException;
 use WendellAdriel\Expressive\Exceptions\NonNullablePropertyException;
+use WendellAdriel\Expressive\Exceptions\UnfillableExpressivePropertyException;
 use WendellAdriel\Expressive\Exceptions\UnsupportedRelationshipPersistenceException;
 use WendellAdriel\Expressive\Expressive;
 
@@ -109,9 +111,19 @@ final class ExpressiveMapper
                 continue;
             }
 
-            if ($model->isFillable($metadata->key)) {
-                $attributes[$metadata->key] = $value;
+            if (! $model->isFillable($metadata->key)) {
+                if ($value === null) {
+                    continue;
+                }
+
+                if ((bool) config('expressive.diagnostics.throw_on_unfillable', false)) {
+                    throw UnfillableExpressivePropertyException::forProperty($expressive::class, $metadata->name, $metadata->key, $model::class);
+                }
+
+                continue;
             }
+
+            $attributes[$metadata->key] = $value;
         }
 
         $model->fill($attributes);
@@ -162,7 +174,7 @@ final class ExpressiveMapper
                 continue;
             }
 
-            if ($relation instanceof HasMany) {
+            if ($relation instanceof HasMany || $relation instanceof MorphMany) {
                 if ($relationshipValue instanceof EloquentCollection) {
                     $relation->saveMany($relationshipValue);
                 }

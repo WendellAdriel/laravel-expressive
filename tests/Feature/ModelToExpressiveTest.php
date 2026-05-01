@@ -3,13 +3,16 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\DB;
 use WendellAdriel\Expressive\Exceptions\NonExistingExpressiveClassException;
 use WendellAdriel\Expressive\Exceptions\NonNullablePropertyException;
+use WendellAdriel\Expressive\Tests\Fixtures\Expressives\Comment as ExpressiveComment;
 use WendellAdriel\Expressive\Tests\Fixtures\Expressives\Post as ExpressivePost;
 use WendellAdriel\Expressive\Tests\Fixtures\Expressives\Suffixed\UserExpressive;
 use WendellAdriel\Expressive\Tests\Fixtures\Expressives\User as ExpressiveUser;
 use WendellAdriel\Expressive\Tests\Fixtures\Models\Address;
+use WendellAdriel\Expressive\Tests\Fixtures\Models\Comment;
 use WendellAdriel\Expressive\Tests\Fixtures\Models\ExplicitUser;
 use WendellAdriel\Expressive\Tests\Fixtures\Models\InvalidRelationshipUser;
 use WendellAdriel\Expressive\Tests\Fixtures\Models\Post;
@@ -122,4 +125,42 @@ it('bulk loads requested relationships for collection conversion', function (): 
     expect($users)->toHaveCount(2)
         ->toContainOnlyInstancesOf(ExpressiveUser::class)
         ->and($queries)->toHaveCount(1);
+});
+
+it('converts loaded morph many relations without lazy loading', function (): void {
+    $user = User::query()->create(['name' => 'Wendell', 'email' => 'wendell@example.com', 'role' => UserRole::User]);
+    Comment::query()->create(['body' => 'First', 'commentable_type' => $user::class, 'commentable_id' => $user->id]);
+    Comment::query()->create(['body' => 'Second', 'commentable_type' => $user::class, 'commentable_id' => $user->id]);
+
+    Model::preventLazyLoading(true);
+
+    try {
+        $expressive = $user->fresh()->expressive(relationships: ['comments']);
+
+        expect($expressive->comments)->toHaveCount(2)
+            ->toContainOnlyInstancesOf(ExpressiveComment::class)
+            ->sequence(
+                fn ($comment) => $comment->body->toBe('First'),
+                fn ($comment) => $comment->body->toBe('Second'),
+            );
+    } finally {
+        Model::preventLazyLoading(false);
+    }
+});
+
+it('does not change runtime morph conversion assumptions when a morph map is configured', function (): void {
+    Relation::morphMap(['expressive-user' => User::class]);
+
+    try {
+        $user = User::query()->create(['name' => 'Wendell', 'email' => 'wendell@example.com', 'role' => UserRole::User]);
+        $user->comments()->create(['body' => 'Mapped']);
+
+        $expressive = $user->fresh()->expressive(relationships: ['comments']);
+
+        expect($expressive->comments)->toHaveCount(1)
+            ->and($expressive->comments->first())->toBeInstanceOf(ExpressiveComment::class)
+            ->and($expressive->comments->first()->commentableType)->toBe('expressive-user');
+    } finally {
+        Relation::morphMap([], false);
+    }
 });

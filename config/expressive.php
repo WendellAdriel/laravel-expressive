@@ -29,4 +29,19 @@ return [
 
     'suffix' => '',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Diagnostics
+    |--------------------------------------------------------------------------
+    |
+    | Keep runtime conversion conservative by default. When enabled, Expressive
+    | throws if a non-virtual, non-relationship property maps to an attribute
+    | that Eloquent will not fill because it is not fillable.
+    |
+    */
+
+    'diagnostics' => [
+        'throw_on_unfillable' => false,
+    ],
+
 ];

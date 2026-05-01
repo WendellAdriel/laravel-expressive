@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
+use InvalidArgumentException;
 use WendellAdriel\Expressive\Console\Commands\MakeExpressiveCommand;
 use WendellAdriel\Expressive\Support\ExpressiveMapper;
 
@@ -65,6 +66,19 @@ final class ExpressiveServiceProvider extends ServiceProvider
             Builder::macro('expressive', function (array|string $relationships = [], array|string $attributes = []): Collection {
                 /** @var Builder<Model> $this */
                 return ExpressiveMapper::fromCollection($this->get(), $relationships, $attributes);
+            });
+        }
+
+        if (! Builder::hasGlobalMacro('expressiveChunk')) {
+            Builder::macro('expressiveChunk', function (int $count, callable $callback, array|string $relationships = [], array|string $attributes = []): bool {
+                if ($count < 1) {
+                    throw new InvalidArgumentException('The expressive chunk size must be at least 1.');
+                }
+
+                /** @var Builder<Model> $this */
+                return $this->chunk($count, function (EloquentCollection $models) use ($callback, $relationships, $attributes): mixed {
+                    return $callback(ExpressiveMapper::fromCollection($models, $relationships, $attributes));
+                });
             });
         }
     }

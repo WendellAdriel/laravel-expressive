@@ -21,3 +21,51 @@ Use the bundled workbench when expressive needs to be exercised inside a real La
 composer build
 composer serve
 ```
+
+## Adoption Assertions
+
+When adding Expressive to an existing model, test the observable round trip instead of package internals:
+
+```php
+it('converts users to expressive objects', function (): void {
+    $user = User::factory()->create();
+
+    expect($user->expressive())
+        ->toBeInstanceOf(App\Expressive\User::class)
+        ->and($user->expressive()->model())
+        ->toBeInstanceOf(User::class);
+});
+```
+
+Test relationship conversion explicitly when a typed object exposes relationships:
+
+```php
+it('converts requested relationships', function (): void {
+    $user = User::factory()->hasPosts(2)->create();
+
+    $expressive = $user->expressive(relationships: ['posts']);
+
+    expect($expressive->posts)
+        ->toHaveCount(2)
+        ->toContainOnlyInstancesOf(App\Expressive\Post::class);
+});
+```
+
+Collection and builder macros can be tested by asserting the returned collection items, and large datasets can use `expressiveChunk()`:
+
+```php
+User::query()->expressiveChunk(100, function ($users): void {
+    expect($users)->toContainOnlyInstancesOf(App\Expressive\User::class);
+});
+```
+
+For save behavior, assert the database writes you expect and keep many-to-many relations explicit in application code:
+
+```php
+$saved = (new App\Expressive\User([
+    'name' => 'Wendell',
+    'email' => 'wendell@example.com',
+]))->save();
+
+expect($saved->exists)->toBeTrue();
+```

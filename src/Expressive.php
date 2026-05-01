@@ -4,13 +4,21 @@ declare(strict_types=1);
 
 namespace WendellAdriel\Expressive;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use JsonSerializable;
+use WendellAdriel\Expressive\Actions\ExpressiveMetadata;
+use WendellAdriel\Expressive\DTOs\PropertyMetadata;
+use WendellAdriel\Expressive\Support\ClassResolver;
 use WendellAdriel\Expressive\Support\ExpressiveMapper;
 
 /**
  * @template-covariant TModel of Model
+ *
+ * @implements Arrayable<string, mixed>
  */
-abstract class Expressive
+abstract class Expressive implements Arrayable, JsonSerializable
 {
     /**
      * @param  array<string, mixed>  $values
@@ -44,5 +52,71 @@ abstract class Expressive
         $model = ExpressiveMapper::save($this);
 
         return $model;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toArray(): array
+    {
+        $values = [];
+        $model = $this->serializationModel();
+        $visible = $model->getVisible();
+        $hidden = $model->getHidden();
+
+        foreach ((new ExpressiveMetadata)->handle($this::class) as $metadata) {
+            if (! $metadata->property->isInitialized($this) || ! $this->isArrayableProperty($metadata, $visible, $hidden)) {
+                continue;
+            }
+
+            $values[$metadata->name] = $this->arrayValue($metadata->property->getValue($this));
+        }
+
+        return $values;
+    }
+
+    public function jsonSerialize(): mixed
+    {
+        return $this->toArray();
+    }
+
+    private function arrayValue(mixed $value): mixed
+    {
+        if ($value instanceof self) {
+            return $value->toArray();
+        }
+
+        if ($value instanceof Collection) {
+            return $value->map(fn (mixed $item): mixed => $this->arrayValue($item))->toArray();
+        }
+
+        return $value;
+    }
+
+    private function serializationModel(): Model
+    {
+        $modelClass = ClassResolver::modelClassFor($this);
+
+        if (function_exists('app')) {
+            /** @var Model $model */
+            $model = app()->make($modelClass);
+
+            return $model;
+        }
+
+        return new $modelClass;
+    }
+
+    /**
+     * @param  list<string>  $visible
+     * @param  list<string>  $hidden
+     */
+    private function isArrayableProperty(PropertyMetadata $metadata, array $visible, array $hidden): bool
+    {
+        if ($visible !== [] && ! in_array($metadata->key, $visible, true)) {
+            return false;
+        }
+
+        return ! in_array($metadata->key, $hidden, true);
     }
 }

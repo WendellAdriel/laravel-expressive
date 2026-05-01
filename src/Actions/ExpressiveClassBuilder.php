@@ -16,14 +16,18 @@ use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use WendellAdriel\Expressive\Exceptions\UnsupportedGenerationException;
 
 final readonly class ExpressiveClassBuilder
 {
     public function __construct(private CastTypeResolver $castTypeResolver) {}
 
-    public function handle(string $stub, string $namespace, string $class, Model $model): string
+    /**
+     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool}  $options
+     */
+    public function handle(string $stub, string $namespace, string $class, Model $model, array $options = []): string
     {
-        $properties = $this->propertiesFor($namespace, $model);
+        $properties = $this->propertiesFor($namespace, $model, $options);
 
         $modelAlias = class_basename($model).'Model';
         $imports = collect(explode("\n", $properties['imports']))
@@ -41,25 +45,42 @@ final readonly class ExpressiveClassBuilder
     }
 
     /**
+     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool}  $options
      * @return array{imports: string, properties: string}
      */
-    private function propertiesFor(string $namespace, Model $model): array
+    private function propertiesFor(string $namespace, Model $model, array $options): array
     {
         $imports = [
             'WendellAdriel\\Expressive\\Expressive',
         ];
         $properties = [];
         $columns = $model->getConnection()->getSchemaBuilder()->getColumns($model->getTable());
+        $hidden = (bool) ($options['exclude_hidden'] ?? false) ? $model->getHidden() : [];
+        $columnNames = array_column($columns, 'name');
+        $virtualAttributes = $this->virtualAttributesFor($model, $columnNames);
+        $selectedAttributes = $this->selectedAttributesFor($model, $columnNames, $virtualAttributes, $options);
 
         foreach ($columns as $column) {
+            if ($selectedAttributes !== null && ! in_array($column['name'], $selectedAttributes, true)) {
+                continue;
+            }
+
+            if (in_array($column['name'], $hidden, true)) {
+                continue;
+            }
+
             $properties[] = $this->columnProperty($column, $model, $imports);
         }
 
-        foreach ($this->relationshipsFor($model) as $relationship) {
+        foreach ($this->filteredRelationshipsFor($model, $options) as $relationship) {
             $properties[] = $this->relationshipProperty($namespace, $relationship, $imports);
         }
 
-        foreach ($this->virtualAttributesFor($model, array_column($columns, 'name')) as $attribute) {
+        foreach ($virtualAttributes as $attribute) {
+            if ($selectedAttributes !== null && ! in_array($attribute, $selectedAttributes, true)) {
+                continue;
+            }
+
             $imports[] = 'WendellAdriel\\Expressive\\Attributes\\Virtual';
             $properties[] = "    #[Virtual]\n    public ?string $".Str::camel($attribute).' = null;';
         }
@@ -87,6 +108,10 @@ final readonly class ExpressiveClassBuilder
         $prefix = $nullable && $type !== 'mixed' && ! str_starts_with($type, '?') ? '?' : '';
         $default = $nullable ? ' = null' : '';
         $lines = [];
+
+        if ($generatedType->phpDocType !== null) {
+            $lines[] = "    /** @var {$generatedType->phpDocType}".($nullable ? '|null' : '').' */';
+        }
 
         $lines[] = "    public {$prefix}{$type} $".$property.$default.';';
 
@@ -119,6 +144,64 @@ final readonly class ExpressiveClassBuilder
         }
 
         return $relationships;
+    }
+
+    /**
+     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool}  $options
+     * @return list<array{name: string, type: string, related: class-string<Model>|null}>
+     */
+    private function filteredRelationshipsFor(Model $model, array $options): array
+    {
+        if ((bool) ($options['without_relationships'] ?? false)) {
+            return [];
+        }
+
+        $relationships = $this->relationshipsFor($model);
+        $only = $options['relationships'] ?? null;
+
+        if ($only === null) {
+            return $relationships;
+        }
+
+        $names = array_column($relationships, 'name');
+        $missing = array_values(array_diff($only, $names));
+
+        if ($missing !== []) {
+            throw UnsupportedGenerationException::unknownRelationships($model::class, $missing);
+        }
+
+        return array_values(array_filter(
+            $relationships,
+            static fn (array $relationship): bool => in_array($relationship['name'], $only, true),
+        ));
+    }
+
+    /**
+     * @param  list<string>  $columns
+     * @param  list<string>  $virtualAttributes
+     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool}  $options
+     * @return list<string>|null
+     */
+    private function selectedAttributesFor(Model $model, array $columns, array $virtualAttributes, array $options): ?array
+    {
+        if ((bool) ($options['without_attributes'] ?? false)) {
+            return [];
+        }
+
+        $only = $options['attributes'] ?? null;
+
+        if ($only === null) {
+            return null;
+        }
+
+        $available = [...$columns, ...$virtualAttributes];
+        $missing = array_values(array_diff($only, $available));
+
+        if ($missing !== []) {
+            throw UnsupportedGenerationException::unknownAttributes($model::class, $missing);
+        }
+
+        return $only;
     }
 
     /**

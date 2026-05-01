@@ -23,6 +23,12 @@ final class MakeExpressiveCommand extends Command
         {--model= : The Eloquent model class}
         {--namespace= : Override the configured Expressive namespace}
         {--suffix= : Override the configured Expressive suffix}
+        {--without-attributes : Do not generate attribute properties}
+        {--attributes= : Generate only the given comma-separated attribute properties}
+        {--without-relationships : Do not generate relationship properties}
+        {--relationships= : Generate only the given comma-separated relationship properties}
+        {--exclude-hidden : Exclude hidden model attributes from generated properties}
+        {--dry-run : Print the generated class without writing it}
         {--force : Overwrite the Expressive class if it already exists}';
 
     protected $description = 'Create a new Expressive class from an Eloquent model';
@@ -38,7 +44,7 @@ final class MakeExpressiveCommand extends Command
         $namespace = trim((string) ($this->option('namespace') ?: config('expressive.namespace', 'App\\Expressive')), '\\');
         $path = $this->pathFor($namespace, $class);
 
-        if ($files->exists($path) && ! $this->option('force')) {
+        if (! $this->option('dry-run') && $files->exists($path) && ! $this->option('force')) {
             $this->components->error('Expressive already exists.');
 
             return self::FAILURE;
@@ -49,9 +55,22 @@ final class MakeExpressiveCommand extends Command
         }
 
         $stub = $files->get($this->stubPath($files));
+        $contents = $builder->handle($stub, $namespace, $class, $model, [
+            'without_attributes' => (bool) $this->option('without-attributes'),
+            'attributes' => $this->option('attributes') === null ? null : $this->listOption('attributes'),
+            'without_relationships' => (bool) $this->option('without-relationships'),
+            'relationships' => $this->option('relationships') === null ? null : $this->listOption('relationships'),
+            'exclude_hidden' => (bool) $this->option('exclude-hidden'),
+        ]);
+
+        if ($this->option('dry-run')) {
+            $this->line($contents);
+
+            return self::SUCCESS;
+        }
 
         $files->ensureDirectoryExists(dirname($path));
-        $files->put($path, $builder->handle($stub, $namespace, $class, $model));
+        $files->put($path, $contents);
 
         $this->components->info("Expressive [{$path}] created successfully.");
 
@@ -108,6 +127,18 @@ final class MakeExpressiveCommand extends Command
         }
 
         return base_path(str_replace('\\', '/', $namespace).'/'.$class.'.php');
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function listOption(string $option): array
+    {
+        return collect(explode(',', (string) $this->option($option)))
+            ->map(static fn (string $value): string => trim($value))
+            ->filter()
+            ->values()
+            ->all();
     }
 
     /**
