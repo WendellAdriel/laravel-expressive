@@ -9,6 +9,7 @@ use WendellAdriel\Expressive\Tests\Fixtures\Models\User;
 
 beforeEach(function (): void {
     File::deleteDirectory(app_path('SyncExpressive'));
+    File::deleteDirectory(base_path('stubs'));
 });
 
 function syncArguments(array $arguments = []): array
