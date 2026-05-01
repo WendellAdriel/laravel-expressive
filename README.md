@@ -151,7 +151,7 @@ $users = User::query()
     ->expressive(relationships: ['posts']);
 ```
 
-Access the full documentation [here](#).
+Access the full documentation [here](https://wendelladriel.github.io/laravel-expressive).
 
 ## Changelog
 

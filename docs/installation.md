@@ -1,29 +1,43 @@
 # Installation
 
-Install Expressive into a Laravel application with Composer:
+- [Requirements](#requirements)
+- [Installing Expressive](#installing-expressive)
+- [Publishing package files](#publishing-package-files)
+- [Next steps](#next-steps)
 
-```bash
+## Requirements
+
+Expressive requires PHP 8.3 or higher and supports Laravel 12 and 13.
+
+## Installing Expressive
+
+You may install Expressive into a Laravel application with Composer:
+
+```shell
 composer require wendelladriel/laravel-expressive
 ```
 
-Publish the package resources with the umbrella tag:
+Laravel discovers the package service provider automatically. The service provider registers the configuration file, Artisan commands, and Eloquent macros used by the package.
 
-```bash
+## Publishing package files
+
+You may publish all Expressive resources with the package's umbrella tag:
+
+```shell
 php artisan vendor:publish --tag="expressive"
 ```
 
-You may also publish resources separately:
+This publishes the configuration file to `config/expressive.php` and the generator stub to `stubs/expressive.stub`.
 
-```bash
+If you only need one resource, you may publish the config file or stub separately:
+
+```shell
 php artisan vendor:publish --tag="expressive-config"
 php artisan vendor:publish --tag="expressive-stubs"
 ```
 
-The config file contains the implicit lookup namespace and optional class suffix:
+Publishing the stub is optional. Expressive uses its bundled stub unless `stubs/expressive.stub` exists in your application.
 
-```php
-return [
-    'namespace' => 'App\\Expressive',
-    'suffix' => '',
-];
-```
+## Next steps
+
+After installation, review the [configuration options](configuration.md), add the `IsExpressive` trait to a model, and define or [generate an Expressive class](generator.md) for that model.

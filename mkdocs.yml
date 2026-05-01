@@ -20,5 +20,11 @@ theme:
 nav:
   - Overview: index.md
   - Installation: installation.md
-  - Usage: usage.md
-  - Testing: testing.md
+  - Configuration: configuration.md
+  - Defining Expressive Classes: defining-expressives.md
+  - Converting Models: converting-models.md
+  - Relationships: relationships.md
+  - Serialization: serialization.md
+  - Persistence: persistence.md
+  - Generating Expressive Classes: generator.md
+  - Syncing Generated Classes: syncing.md

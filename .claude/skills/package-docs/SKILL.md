@@ -34,15 +34,21 @@ Keep package docs concise, accurate, and useful for developers installing, confi
 - `README.md`
 - `docs/index.md`
 - `docs/installation.md`
-- `docs/usage.md`
-- `docs/testing.md`
+- `docs/configuration.md`
+- `docs/defining-expressives.md`
+- `docs/converting-models.md`
+- `docs/relationships.md`
+- `docs/serialization.md`
+- `docs/persistence.md`
+- `docs/generator.md`
+- `docs/syncing.md`
 - `.github/CONTRIBUTING.md`
 - `mkdocs.yml`
 
 ## Examples
 
 - Add installation docs that show `composer require wendelladriel/laravel-expressive`, publish tags, and migration steps when relevant.
-- Add usage, testing, and workbench docs that explain how to run `composer test`, `composer build`, and `composer serve` without over-documenting internals.
+- Add installation and usage docs that explain package setup without over-documenting internals.
 
 ## Anti-Patterns
 
