@@ -18,13 +18,16 @@
     ],
     "require": {
         "php": "^8.3",
+        "illuminate/console": "^12.0||^13.0",
         "illuminate/contracts": "^12.0||^13.0",
+        "illuminate/database": "^12.0||^13.0",
+        "illuminate/filesystem": "^12.0||^13.0",
         "illuminate/support": "^12.0||^13.0"
     },
     "require-dev": {
         "larastan/larastan": "^3.9",
+        "laravel/pao": "^1.0",
         "laravel/pint": "^1.29",
-        "nunomaduro/pao": "^1.0",
         "orchestra/testbench": "^10.0||^11.0",
         "pestphp/pest": "^4.6",
         "pestphp/pest-plugin-laravel": "^4.1",
@@ -68,10 +71,10 @@
             "vendor/bin/pint --parallel --test"
         ],
         "analyse": [
-            "vendor/bin/phpstan analyse"
+            "@php -d memory_limit=512M vendor/bin/phpstan analyse"
         ],
         "test:types": [
-            "vendor/bin/pest --type-coverage --min=100"
+            "@php -d memory_limit=512M vendor/bin/pest --type-coverage --min=100"
         ],
         "test:unit": [
             "vendor/bin/pest --parallel"
@@ -90,10 +93,7 @@
         "laravel": {
             "providers": [
                 "WendellAdriel\\Expressive\\ExpressiveServiceProvider"
-            ],
-            "aliases": {
-                "Expressive": "WendellAdriel\\Expressive\\Facades\\Expressive"
-            }
+            ]
         }
     },
     "config": {

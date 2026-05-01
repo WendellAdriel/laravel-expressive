@@ -30,7 +30,128 @@ php artisan vendor:publish --tag="expressive"
 
 ## Usage
 
-Document how to use Expressive here.
+Add the `IsExpressive` trait to models that should convert to typed Expressive objects:
+
+```php
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use WendellAdriel\Expressive\Concerns\IsExpressive;
+
+#[Fillable(['name', 'email', 'role', 'password'])]
+#[Hidden(['password', 'remember_token'])]
+class User extends Authenticatable
+{
+    use IsExpressive, Notifiable;
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function address(): HasOne
+    {
+        return $this->hasOne(Address::class);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'role' => UserRole::class,
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    protected function displayName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => "{$this->name} ({$this->role->value})",
+        );
+    }
+}
+```
+
+Generate an Expressive class from a model:
+
+```bash
+php artisan make:expressive User --model="App\Models\User"
+```
+
+The generated class will live in `App\Expressive` by default:
+
+```php
+use App\Enums\UserRole;
+use App\Expressive\Address;
+use App\Expressive\Post;
+use App\Models\User as UserModel;
+use Carbon\CarbonInterface;
+use Illuminate\Support\Collection;
+use WendellAdriel\Expressive\Attributes\Relationship;
+use WendellAdriel\Expressive\Attributes\Virtual;
+use WendellAdriel\Expressive\Expressive;
+
+/**
+ * @extends Expressive<UserModel>
+ */
+final class User extends Expressive
+{
+    public ?int $id = null;
+
+    public string $name;
+
+    public string $email;
+
+    public UserRole $role;
+
+    public string $password;
+
+    public ?string $rememberToken = null;
+
+    public ?CarbonInterface $emailVerifiedAt = null;
+
+    public ?CarbonInterface $createdAt = null;
+
+    public ?CarbonInterface $updatedAt = null;
+
+    #[Relationship]
+    public ?Address $address = null;
+
+    /** @var Collection<int, Post>|null */
+    #[Relationship]
+    public ?Collection $posts = null;
+
+    #[Virtual]
+    public ?string $displayName = null;
+}
+```
+
+Loaded relationships are converted recursively. A `HasOne` relation becomes the related model's Expressive object, and a `HasMany` relation becomes a `Collection` of Expressive objects.
+
+Convert models, collections, and builders:
+
+```php
+$user = User::findOrFail(1)->expressive(attributes: ['display_name']);
+```
+
+```php
+$users = User::query()->get()->expressive(relationships: ['posts']);
+```
+
+```php
+$users = User::query()
+    ->where('active', true)
+    ->expressive(relationships: ['posts']);
+```
+
+Access the full documentation [here](#).
 
 ## Testing
 

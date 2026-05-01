@@ -3,18 +3,30 @@
 declare(strict_types=1);
 
 return [
-
     /*
     |--------------------------------------------------------------------------
-    | Placeholder Value
+    | Expressive Namespace
     |--------------------------------------------------------------------------
     |
-    | This value is a packaged default that demonstrates how host applications
-    | can override the configuration after merging. Replace this block when
-    | you evolve the expressive into your own package.
+    | Here you may define the namespace where Expressive classes are generated for
+    | your application and resolved during implicit mapping. This default path
+    | matches the standard namespace used by fresh Laravel applications.
     |
     */
 
-    'placeholder' => 'default',
+    'namespace' => 'App\\Expressive',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Expressive Class Suffix
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the suffix appended to generated Expressive class names
+    | and used during implicit lookups. Keep this value empty when your typed
+    | objects should use the mapped Eloquent model base name for lookup.
+    |
+    */
+
+    'suffix' => '',
 
 ];

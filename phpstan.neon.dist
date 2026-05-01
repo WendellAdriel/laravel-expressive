@@ -4,3 +4,7 @@ parameters:
         - src
         - config
     tmpDir: build/phpstan
+    ignoreErrors:
+        -
+            identifier: trait.unused
+            path: src/Concerns/IsExpressive.php

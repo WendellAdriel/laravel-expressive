@@ -12,10 +12,18 @@ Publish the package resources with the umbrella tag:
 php artisan vendor:publish --tag="expressive"
 ```
 
-If the package ships migrations, run them after publishing:
+You may also publish resources separately:
 
 ```bash
-php artisan migrate
+php artisan vendor:publish --tag="expressive-config"
+php artisan vendor:publish --tag="expressive-stubs"
 ```
 
-Update this page with any configuration, environment variables, or install checks that Expressive requires.
+The config file contains the implicit lookup namespace and optional class suffix:
+
+```php
+return [
+    'namespace' => 'App\\Expressive',
+    'suffix' => '',
+];
+```
