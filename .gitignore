@@ -1,6 +1,12 @@
 /vendor
 /build
 /node_modules
+/docs/.vitepress/cache
+/docs/.vitepress/dist
+/package-lock.json
+/pnpm-lock.yaml
+/bun.lock
+/bun.lockb
 /.phpunit.cache
 /.phpunit.result.cache
 /coverage

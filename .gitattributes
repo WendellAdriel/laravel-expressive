@@ -10,8 +10,8 @@
 /pint.json          export-ignore
 /workbench          export-ignore
 /docs               export-ignore
-/mkdocs.yml         export-ignore
-/site               export-ignore
+/package.json       export-ignore
+/docs/.vitepress/dist export-ignore
 /.claude            export-ignore
 /.agents            export-ignore
 /CLAUDE.md          export-ignore

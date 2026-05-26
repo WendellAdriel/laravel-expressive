@@ -1,6 +1,6 @@
 ---
 name: package-docs
-description: "Use this skill when writing or revising package documentation after creating a package from this starter: README content, MkDocs pages, contributing docs, upgrade notes, installation, usage, testing, workbench docs, or examples."
+description: "Use this skill when writing or revising package documentation after creating a package from this starter: README content, VitePress pages, contributing docs, upgrade notes, installation, usage, testing, workbench docs, or examples."
 license: MIT
 metadata:
   author: laravel
@@ -14,12 +14,12 @@ Keep package docs concise, accurate, and useful for developers installing, confi
 
 ## Workflow
 
-1. Inspect `README.md`, `docs/`, `mkdocs.yml`, and contributing docs before writing new documentation.
+1. Inspect `README.md`, `docs/`, `docs/.vitepress/config.ts`, and contributing docs before writing new documentation.
 2. Use the configured package name, vendor slug, namespace, commands, config keys, and publish tags consistently.
 3. Remove starter-only setup notes once they no longer apply to the configured package.
-4. Cover README, MkDocs pages, contributing docs, upgrade notes if added later, and package usage examples using Laravel ecosystem tone.
+4. Cover README, VitePress pages, contributing docs, upgrade notes if added later, and package usage examples using Laravel ecosystem tone.
 5. Write direct, Laravel-style documentation: short paragraphs, imperative setup steps, concrete examples, and no marketing filler.
-6. Keep README content high level and move longer guides to MkDocs pages when the details would distract from first-run package setup.
+6. Keep README content high level and move longer guides to VitePress pages when the details would distract from first-run package setup.
 
 ## Writing Rules
 
@@ -43,7 +43,7 @@ Keep package docs concise, accurate, and useful for developers installing, confi
 - `docs/generator.md`
 - `docs/syncing.md`
 - `.github/CONTRIBUTING.md`
-- `mkdocs.yml`
+- `docs/.vitepress/config.ts`
 
 ## Examples
 
@@ -54,5 +54,5 @@ Keep package docs concise, accurate, and useful for developers installing, confi
 
 - Documenting unreleased or unimplemented package features as if they exist.
 - Breaking placeholders or replacing them with a real vendor/package name too early.
-- Duplicating large sections between README and MkDocs when a short cross-reference is enough.
+- Duplicating large sections between README and VitePress when a short cross-reference is enough.
 - Leaking starter-only instructions into finished package documentation.

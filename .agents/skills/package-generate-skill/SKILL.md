@@ -15,7 +15,7 @@ Keep the package's bundled Boost skill accurate, concise, and focused on helping
 ## Workflow
 
 1. Inspect the package implementation before editing the Boost skill: service provider, facades, public classes, commands, config, routes, migrations, events, views, publish tags, and tests.
-2. Inspect package documentation: `README.md`, `docs/`, `mkdocs.yml`, contributing docs, examples, and changelog entries that describe user-facing behavior.
+2. Inspect package documentation: `README.md`, `docs/`, `docs/.vitepress/config.ts`, contributing docs, examples, and changelog entries that describe user-facing behavior.
 3. Identify the public integration surface only. Include install, configure, publish, command, route, facade, helper, middleware, event, and testing guidance only when the package actually exposes it.
 4. Update `resources/boost/skills/*/SKILL.md` with practical adoption steps, references, examples, and anti-patterns for Laravel app developers using the package.
 5. Preserve front matter, package metadata, placeholders in unconfigured packages, and the Boost skill structure: description, primary goal, workflow, references, examples, and anti-patterns.
