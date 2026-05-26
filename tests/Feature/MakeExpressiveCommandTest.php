@@ -19,6 +19,10 @@ beforeEach(function (): void {
     Relation::morphMap([], false);
 });
 
+afterEach(function (): void {
+    Relation::morphMap([], false);
+});
+
 it('generates an expressive class from a model using default config', function (): void {
     Artisan::call('make:expressive', [
         'name' => 'User',
