@@ -1,3 +1,7 @@
+<div align="center">
+    <img src="/logo.png" alt="Expressive" style="width: 220px; height: auto;">
+</div>
+
 # Expressive
 
 - [Introduction](#introduction)
