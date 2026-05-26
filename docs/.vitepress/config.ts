@@ -5,16 +5,16 @@ const base = configuredBase.endsWith('/') ? configuredBase : `${configuredBase}/
 
 export default defineConfig({
   title: 'Expressive',
-  description: 'A DTO/Data Mapper Layer on top of Eloquent',
+  description: 'Typed Objects for Eloquent',
   base,
   head: [
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'Expressive' }],
-    ['meta', { property: 'og:description', content: 'A DTO/Data Mapper Layer on top of Eloquent' }],
+    ['meta', { property: 'og:description', content: 'Typed Objects for Eloquent' }],
     ['meta', { property: 'og:image', content: 'https://laravel-expressive.wendelladriel.com/banner.png' }],
     ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
     ['meta', { name: 'twitter:title', content: 'Expressive' }],
-    ['meta', { name: 'twitter:description', content: 'A DTO/Data Mapper Layer on top of Eloquent' }],
+    ['meta', { name: 'twitter:description', content: 'Typed Objects for Eloquent' }],
     ['meta', { name: 'twitter:image', content: 'https://laravel-expressive.wendelladriel.com/banner.png' }],
   ],
   themeConfig: {

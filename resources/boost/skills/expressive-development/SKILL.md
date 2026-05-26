@@ -13,7 +13,7 @@ metadata:
 
 # Expressive Development
 
-Use this skill when a Laravel application needs a typed DTO/Data Mapper Layer on top of Eloquent using Expressive.
+Use this skill when a Laravel application needs Typed Objects for Eloquent using Expressive.
 
 ## Primary Goal
 

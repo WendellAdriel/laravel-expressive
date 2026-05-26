@@ -1,7 +1,7 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
     "name": "wendelladriel/laravel-expressive",
-    "description": "A DTO/Data Mapper Layer on top of Eloquent",
+    "description": "Typed Objects for Eloquent",
     "keywords": [
         "wendelladriel",
         "laravel",

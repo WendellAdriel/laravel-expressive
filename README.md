@@ -2,7 +2,7 @@
     <img src="https://github.com/wendelladriel/laravel-expressive/raw/main/art/banner.png" alt="Expressive" height="300"/>
     <p>
         <h1>Expressive</h1>
-        A DTO/Data Mapper Layer on top of Eloquent
+        Typed Objects for Eloquent
     </p>
 </div>
 

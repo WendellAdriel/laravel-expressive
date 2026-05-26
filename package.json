@@ -2,7 +2,7 @@
   "name": "laravel-expressive-docs",
   "private": true,
   "type": "module",
-  "description": "A DTO/Data Mapper Layer on top of Eloquent",
+  "description": "Typed Objects for Eloquent",
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
