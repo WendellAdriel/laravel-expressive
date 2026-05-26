@@ -8,6 +8,9 @@ export default defineConfig({
   description: 'Typed Objects for Eloquent',
   base,
   head: [
+    ['link', { rel: 'preconnect', href: 'https://fonts.googleapis.com' }],
+    ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+    ['link', { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap' }],
     ['meta', { property: 'og:type', content: 'website' }],
     ['meta', { property: 'og:title', content: 'Expressive' }],
     ['meta', { property: 'og:description', content: 'Typed Objects for Eloquent' }],
@@ -17,6 +20,12 @@ export default defineConfig({
     ['meta', { name: 'twitter:description', content: 'Typed Objects for Eloquent' }],
     ['meta', { name: 'twitter:image', content: 'https://laravel-expressive.wendelladriel.com/banner.png' }],
   ],
+  markdown: {
+    theme: {
+      light: 'catppuccin-latte',
+      dark: 'catppuccin-mocha',
+    },
+  },
   themeConfig: {
     sidebar: [
       { text: 'Overview', link: '/' },
