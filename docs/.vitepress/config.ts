@@ -7,6 +7,16 @@ export default defineConfig({
   title: 'Expressive',
   description: 'A DTO/Data Mapper Layer on top of Eloquent',
   base,
+  head: [
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: 'Expressive' }],
+    ['meta', { property: 'og:description', content: 'A DTO/Data Mapper Layer on top of Eloquent' }],
+    ['meta', { property: 'og:image', content: 'https://laravel-expressive.wendelladriel.com/banner.png' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:title', content: 'Expressive' }],
+    ['meta', { name: 'twitter:description', content: 'A DTO/Data Mapper Layer on top of Eloquent' }],
+    ['meta', { name: 'twitter:image', content: 'https://laravel-expressive.wendelladriel.com/banner.png' }],
+  ],
   themeConfig: {
     sidebar: [
       { text: 'Overview', link: '/' },

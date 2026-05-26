@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="/logo.png" alt="Expressive" style="width: 220px; height: auto;">
+    <img src="/banner.png" alt="Expressive" style="width: 520px; max-width: 100%; height: auto; margin-bottom: 2rem;">
 </div>
 
 # Expressive
