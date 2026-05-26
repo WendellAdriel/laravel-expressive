@@ -2,7 +2,7 @@
     <img src="https://github.com/wendelladriel/laravel-expressive/raw/main/art/logo.png" alt="Expressive" height="300"/>
     <p>
         <h1>Expressive</h1>
-        A Data Mapper layer on top of Eloquent
+        A DTO/Data Mapper Layer on top of Eloquent
     </p>
 </div>
 

@@ -11,7 +11,7 @@
 
 ## Introduction
 
-Expressive provides a Data Mapper layer on top of Eloquent. It converts Eloquent models into typed PHP objects and can convert those objects back into Eloquent models when the application needs to persist data.
+Expressive provides a DTO/Data Mapper Layer on top of Eloquent. It converts Eloquent models into typed PHP objects and can convert those objects back into Eloquent models when the application needs to persist data.
 
 Eloquent remains responsible for querying, relationships, casts, visibility rules, mass assignment, and database writes. Expressive gives the rest of your application a typed object boundary without replacing Eloquent.
 

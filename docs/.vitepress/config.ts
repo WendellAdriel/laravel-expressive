@@ -5,7 +5,7 @@ const base = configuredBase.endsWith('/') ? configuredBase : `${configuredBase}/
 
 export default defineConfig({
   title: 'Expressive',
-  description: 'A Data Mapper layer on top of Eloquent',
+  description: 'A DTO/Data Mapper Layer on top of Eloquent',
   base,
   themeConfig: {
     sidebar: [
