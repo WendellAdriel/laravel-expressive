@@ -33,15 +33,16 @@ Keep package docs concise, accurate, and useful for developers installing, confi
 
 - `README.md`
 - `docs/index.md`
-- `docs/installation.md`
-- `docs/configuration.md`
-- `docs/defining-expressives.md`
-- `docs/converting-models.md`
-- `docs/relationships.md`
-- `docs/serialization.md`
-- `docs/persistence.md`
-- `docs/generator.md`
-- `docs/syncing.md`
+- `docs/getting-started/installation.md`
+- `docs/getting-started/configuration.md`
+- `docs/getting-started/changelog.md`
+- `docs/basics/defining-expressives.md`
+- `docs/basics/converting-models.md`
+- `docs/basics/relationships.md`
+- `docs/basics/serialization.md`
+- `docs/basics/persistence.md`
+- `docs/commands/generator.md`
+- `docs/commands/syncing.md`
 - `.github/CONTRIBUTING.md`
 - `docs/.vitepress/config.ts`
 

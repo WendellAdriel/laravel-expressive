@@ -40,4 +40,4 @@ Publishing the stub is optional. Expressive uses its bundled stub unless `stubs/
 
 ## Next steps
 
-After installation, review the [configuration options](configuration.md), add the `IsExpressive` trait to a model, and define or [generate an Expressive class](generator.md) for that model.
+After installation, review the [configuration options](configuration.md), add the `IsExpressive` trait to a model, and define or [generate an Expressive class](../commands/generator.md) for that model.

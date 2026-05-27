@@ -29,15 +29,31 @@ export default defineConfig({
   themeConfig: {
     sidebar: [
       { text: 'Overview', link: '/' },
-      { text: 'Installation', link: '/installation' },
-      { text: 'Configuration', link: '/configuration' },
-      { text: 'Defining Expressive Classes', link: '/defining-expressives' },
-      { text: 'Converting Models', link: '/converting-models' },
-      { text: 'Relationships', link: '/relationships' },
-      { text: 'Serialization', link: '/serialization' },
-      { text: 'Persistence', link: '/persistence' },
-      { text: 'Generating Expressive Classes', link: '/generator' },
-      { text: 'Syncing Generated Classes', link: '/syncing' },
+      {
+        text: 'Getting Started',
+        items: [
+          { text: 'Installation', link: '/getting-started/installation' },
+          { text: 'Configuration', link: '/getting-started/configuration' },
+          { text: 'Changelog', link: '/getting-started/changelog' },
+        ],
+      },
+      {
+        text: 'The Basics',
+        items: [
+          { text: 'Defining Expressive Classes', link: '/basics/defining-expressives' },
+          { text: 'Converting Models', link: '/basics/converting-models' },
+          { text: 'Relationships', link: '/basics/relationships' },
+          { text: 'Serialization', link: '/basics/serialization' },
+          { text: 'Persistence', link: '/basics/persistence' },
+        ],
+      },
+      {
+        text: 'Commands',
+        items: [
+          { text: 'Generating Expressive Classes', link: '/commands/generator' },
+          { text: 'Syncing Generated Classes', link: '/commands/syncing' },
+        ],
+      },
     ],
     search: {
       provider: 'local',

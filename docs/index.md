@@ -11,7 +11,7 @@
 
 ## Introduction
 
-Expressive provides Typed Objects for Eloquent. It converts Eloquent models into typed PHP objects and can convert those objects back into Eloquent models when the application needs to persist data.
+Expressive provides typed objects for Eloquent. It converts Eloquent models into typed PHP objects and can convert those objects back into Eloquent models when the application needs to persist data.
 
 Eloquent remains responsible for querying, relationships, casts, visibility rules, mass assignment, and database writes. Expressive gives the rest of your application a typed object boundary without replacing Eloquent.
 
@@ -55,12 +55,12 @@ final class User extends Expressive
 
 Read the docs in this order if you are adding Expressive to an application for the first time:
 
-- [Installation](installation.md)
-- [Configuration](configuration.md)
-- [Defining Expressive classes](defining-expressives.md)
-- [Converting models](converting-models.md)
-- [Relationships](relationships.md)
-- [Serialization](serialization.md)
-- [Persistence](persistence.md)
-- [Generating Expressive classes](generator.md)
-- [Syncing generated classes](syncing.md)
+- [Installation](getting-started/installation.md)
+- [Configuration](getting-started/configuration.md)
+- [Defining Expressive classes](basics/defining-expressives.md)
+- [Converting models](basics/converting-models.md)
+- [Relationships](basics/relationships.md)
+- [Serialization](basics/serialization.md)
+- [Persistence](basics/persistence.md)
+- [Generating Expressive classes](commands/generator.md)
+- [Syncing generated classes](commands/syncing.md)
