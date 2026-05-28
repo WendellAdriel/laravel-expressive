@@ -40,7 +40,7 @@ jobs:
 
       - name: Build documentation
         env:
-          VITEPRESS_BASE: ${{ steps.pages.outputs.base_path }}
+          VITEPRESS_BASE: /
         run: npm run docs:build
 
       - name: Upload Pages artifact

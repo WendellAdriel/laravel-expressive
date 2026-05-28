@@ -85,7 +85,7 @@ Use this skill when a Laravel application needs Typed Objects for Eloquent using
 
 Read before executing:
 
-- official documentation: `https://wendelladriel.github.io/laravel-expressive`
+- official documentation: `https://laravel-expressive.wendelladriel.com`
 - installed package config after publishing: `config/expressive.php`
 - installed package stub after publishing: `stubs/expressive.stub`
 - target application models under `app/Models/`
