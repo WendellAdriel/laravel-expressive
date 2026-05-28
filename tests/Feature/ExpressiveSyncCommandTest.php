@@ -5,21 +5,39 @@ declare(strict_types=1);
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\ParallelTesting;
 use WendellAdriel\Expressive\Tests\Fixtures\Models\User;
 
 beforeEach(function (): void {
-    File::deleteDirectory(app_path('SyncExpressive'));
+    File::deleteDirectory(app_path(syncDirectory()));
     File::deleteDirectory(base_path('stubs'));
 });
 
 function syncArguments(array $arguments = []): array
 {
-    return array_merge(['--namespace' => 'App\SyncExpressive'], $arguments);
+    return array_merge(['--namespace' => syncNamespace()], $arguments);
 }
 
 function syncPath(string $class = 'User'): string
 {
-    return app_path("SyncExpressive/{$class}.php");
+    return app_path(syncDirectory()."/{$class}.php");
+}
+
+function syncDirectory(): string
+{
+    return 'SyncExpressive'.syncToken();
+}
+
+function syncNamespace(): string
+{
+    return 'App\\'.syncDirectory();
+}
+
+function syncToken(): string
+{
+    $token = ParallelTesting::token();
+
+    return $token === false ? '' : (string) $token;
 }
 
 it('reports success for a valid model and expressive pair', function (): void {
@@ -42,7 +60,7 @@ it('reports missing attributes with actionable context', function (): void {
     expect($result)->toBe(Command::FAILURE)
         ->and($output)->toContain('missing_attribute')
         ->and($output)->toContain(User::class)
-        ->and($output)->toContain('App\SyncExpressive\User')
+        ->and($output)->toContain(syncNamespace().'\User')
         ->and($output)->toContain('uuid')
         ->and($output)->toContain('expected: ?string')
         ->and($output)->toContain('Run expressive:sync --write');
@@ -104,7 +122,7 @@ it('reports unresolved model and expressive mappings clearly', function (): void
     expect($missingModel)->toBe(Command::FAILURE)
         ->and($missingModelOutput)->toContain('Model [App\Models\Missing] does not exist')
         ->and($missingExpressive)->toBe(Command::FAILURE)
-        ->and($missingExpressiveOutput)->toContain('Expressive [App\SyncExpressive\Missing] does not exist');
+        ->and($missingExpressiveOutput)->toContain('Expressive ['.syncNamespace().'\Missing] does not exist');
 });
 
 it('does not mutate files without write mode', function (): void {
