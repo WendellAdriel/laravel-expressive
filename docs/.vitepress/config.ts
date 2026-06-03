@@ -35,6 +35,7 @@ export default defineConfig({
           { text: 'Installation', link: '/getting-started/installation' },
           { text: 'Configuration', link: '/getting-started/configuration' },
           { text: 'Changelog', link: '/getting-started/changelog' },
+          { text: 'Resources', link: '/getting-started/resources' },
         ],
       },
       {
