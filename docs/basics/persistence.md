@@ -3,6 +3,7 @@
 - [Introduction](#introduction)
 - [Converting to a model](#converting-to-a-model)
 - [Saving an Expressive object](#saving-an-expressive-object)
+- [Strict mode](#strict-mode)
 - [Fillable attributes](#fillable-attributes)
 - [In-memory relationships](#in-memory-relationships)
 - [Supported relationship persistence](#supported-relationship-persistence)
@@ -41,6 +42,24 @@ $saved = (new App\Expressive\User([
 ```
 
 The method returns the fresh Eloquent model when Laravel can reload it, otherwise it returns the saved model instance.
+
+## Strict mode
+
+Strict mode disables Expressive-owned persistence while keeping conversion available. Enable it when your application should convert Expressive objects back to Eloquent models before any database writes:
+
+```php
+'strict' => true,
+```
+
+When `expressive.strict` is `true`, calling `save()` throws before Expressive converts the object or writes the root model and supported relationships.
+
+Use `model()` when strict mode is enabled, then persist through Eloquent explicitly:
+
+```php
+$model = $expressive->model();
+
+$model->save();
+```
 
 ## Fillable attributes
 

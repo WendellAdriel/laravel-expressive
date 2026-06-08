@@ -14,6 +14,7 @@ use JsonSerializable;
 use WendellAdriel\Expressive\Actions\ExpressiveMetadata;
 use WendellAdriel\Expressive\DTOs\PropertyMetadata;
 use WendellAdriel\Expressive\Exceptions\JsonEncodingException;
+use WendellAdriel\Expressive\Exceptions\StrictModeEnabledException;
 use WendellAdriel\Expressive\Support\ClassResolver;
 use WendellAdriel\Expressive\Support\ExpressiveMapper;
 
@@ -52,6 +53,10 @@ abstract class Expressive implements Arrayable, JsonSerializable
      */
     public function save(): Model
     {
+        if (config('expressive.strict', false)) {
+            throw StrictModeEnabledException::whenSaving($this::class);
+        }
+
         /** @var TModel $model */
         $model = ExpressiveMapper::save($this);
 

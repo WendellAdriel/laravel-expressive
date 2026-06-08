@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\DB;
 use WendellAdriel\Expressive\Exceptions\InvalidConversionValueException;
+use WendellAdriel\Expressive\Exceptions\StrictModeEnabledException;
 use WendellAdriel\Expressive\Exceptions\UnfillableExpressivePropertyException;
 use WendellAdriel\Expressive\Exceptions\UnsupportedRelationshipPersistenceException;
 use WendellAdriel\Expressive\Tests\Fixtures\Expressives\Address as ExpressiveAddress;
@@ -150,6 +151,53 @@ it('saves supported relationship state explicitly', function (): void {
         ->and(User::query()->count())->toBe(1)
         ->and(Address::query()->where('user_id', $model->getKey())->count())->toBe(1)
         ->and(Post::query()->where('user_id', $model->getKey())->count())->toBe(2);
+});
+
+it('saves normally when strict mode is disabled', function (): void {
+    config()->set('expressive.strict', false);
+
+    $model = (new ExpressiveUser([
+        'name' => 'Wendell',
+        'email' => 'wendell@example.com',
+        'role' => UserRole::User,
+    ]))->save();
+
+    expect($model->exists)->toBeTrue()
+        ->and(User::query()->count())->toBe(1);
+});
+
+it('blocks expressive persistence when strict mode is enabled before writing rows', function (): void {
+    config()->set('expressive.strict', true);
+
+    $expressive = new ExpressiveUser([
+        'name' => 'Wendell',
+        'email' => 'wendell@example.com',
+        'role' => UserRole::User,
+        'address' => new ExpressiveAddress(['street' => 'Main', 'city' => 'Lisbon']),
+        'posts' => collect([
+            new ExpressivePost(['title' => 'First']),
+            new ExpressivePost(['title' => 'Second']),
+        ]),
+    ]);
+
+    expect(fn () => $expressive->save())->toThrow(StrictModeEnabledException::class)
+        ->and(User::query()->count())->toBe(0)
+        ->and(Address::query()->count())->toBe(0)
+        ->and(Post::query()->count())->toBe(0);
+});
+
+it('allows model conversion when strict mode is enabled', function (): void {
+    config()->set('expressive.strict', true);
+
+    $model = (new ExpressiveUser([
+        'name' => 'Wendell',
+        'email' => 'wendell@example.com',
+        'role' => UserRole::User,
+    ]))->model();
+
+    expect($model)->toBeInstanceOf(User::class)
+        ->and($model->exists)->toBeFalse()
+        ->and(User::query()->count())->toBe(0);
 });
 
 it('saves morph many relationship state explicitly', function (): void {

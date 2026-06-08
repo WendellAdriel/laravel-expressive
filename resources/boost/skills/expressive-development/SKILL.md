@@ -34,9 +34,10 @@ Use this skill when a Laravel application needs Typed Objects for Eloquent using
 
 - install with `composer require wendelladriel/laravel-expressive`; Laravel auto-discovers the service provider
 - publish with `php artisan vendor:publish --tag="expressive"` only when the app needs `config/expressive.php` or `stubs/expressive.stub`
-- publish only config with `php artisan vendor:publish --tag="expressive-config"` when changing namespace, suffix, diagnostics, serialization casing, or generator defaults
+- publish only config with `php artisan vendor:publish --tag="expressive-config"` when changing namespace, suffix, strict mode, diagnostics, serialization casing, or generator defaults
 - publish only the generator stub with `php artisan vendor:publish --tag="expressive-stubs"` when generated class formatting must be customized
 - set `expressive.namespace` and `expressive.suffix` before relying on implicit lookup or running `make:expressive`
+- set `expressive.strict` to `true` when Expressive objects should convert back to Eloquent models but never write database state through `save()`
 - set `expressive.diagnostics.throw_on_unfillable` to `true` during adoption when ignored unfillable properties should fail fast
 - set `expressive.serialization.case` to `snake` only when serialized keys should be snake case globally
 
@@ -78,7 +79,7 @@ Use this skill when a Laravel application needs Typed Objects for Eloquent using
 - expect nested Expressive objects and collections to serialize recursively
 - expect uninitialized typed properties to be skipped; nullable properties with default `null` are initialized and may appear unless hidden or invisible
 - use `$expressive->model()` to create an unsaved Eloquent model filled only with mapped, fillable, non-virtual, non-relationship properties
-- use `$expressive->save()` to save the root model and supported direct relationships: `BelongsTo`, `HasOne`, `MorphOne`, `HasMany`, and `MorphMany`
+- use `$expressive->save()` to save the root model and supported direct relationships when `expressive.strict` is `false`: `BelongsTo`, `HasOne`, `MorphOne`, `HasMany`, and `MorphMany`
 - keep `BelongsToMany`, morph-to-many, through relationships, pivot semantics, and deletion in explicit Eloquent application code
 
 ## Rules, References, and Templates
@@ -96,7 +97,7 @@ Read before executing:
 
 - For a read boundary, add `IsExpressive` to `App\Models\User`, run `php artisan make:expressive User --model="App\Models\User"`, keep `#[Relationship] public ?Collection $posts = null;`, then return `User::query()->where('active', true)->expressive(relationships: ['posts'])` from an application service.
 - For a custom boundary, create `App\Data\PublicUser extends Expressive`, add `#[Model(App\Models\User::class)]`, include only public properties the service needs, and call `$user->expressive(attributes: ['display_name'])` when a nullable `#[Virtual]` property should be populated.
-- For write input, hydrate an Expressive object from validated data, call `$object->model()` when application code should decide how to save, or call `$object->save()` only when root fillable attributes and supported direct relationships should be persisted immediately.
+- For write input, hydrate an Expressive object from validated data, call `$object->model()` when application code should decide how to save or strict mode is enabled, or call `$object->save()` only when root fillable attributes and supported direct relationships should be persisted immediately.
 - For CI drift checks, run `php artisan expressive:sync User --model="App\Models\User"` and review differences before choosing either a manual class edit or a safe `--write` rewrite.
 
 ## Anti-patterns
@@ -106,6 +107,7 @@ Read before executing:
 - do not rely on lazy loading during conversion; request relationships explicitly
 - do not expect virtual accessors to populate unless passed through `attributes`
 - do not expect `model()` to save records or persist relationships
+- do not call `save()` when `expressive.strict` is enabled; convert with `model()` and persist through Eloquent explicitly
 - do not expect `save()` to handle many-to-many, morph-to-many, through relationships, pivot sync, detach, attach, or deletion
 - do not use `make:expressive --force` or `expressive:sync --write` over custom classes without reviewing intentional user edits
 - do not document private package classes as application-facing APIs

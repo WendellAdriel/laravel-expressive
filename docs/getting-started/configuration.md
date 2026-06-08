@@ -3,6 +3,7 @@
 - [Introduction](#introduction)
 - [Expressive namespace](#expressive-namespace)
 - [Class suffixes](#class-suffixes)
+- [Strict mode](#strict-mode)
 - [Diagnostics](#diagnostics)
 - [Serialization casing](#serialization-casing)
 - [Generator defaults](#generator-defaults)
@@ -15,7 +16,7 @@ Expressive stores its application-level options in `config/expressive.php`. You 
 php artisan vendor:publish --tag="expressive-config"
 ```
 
-The default configuration is intentionally small. It controls implicit class lookup, conversion diagnostics, serialization key casing, and generator defaults.
+The default configuration is intentionally small. It controls implicit class lookup, persistence boundaries, conversion diagnostics, serialization key casing, and generator defaults.
 
 ## Expressive namespace
 
@@ -47,6 +48,30 @@ Keep the suffix empty when your Expressive classes should use the same base name
 
 ```php
 'suffix' => '',
+```
+
+## Strict mode
+
+The `strict` option controls whether Expressive objects may persist database state through `save()`:
+
+```php
+'strict' => false,
+```
+
+Strict mode is disabled by default so existing applications can continue using `save()` to persist converted models and supported relationships.
+
+If you want Eloquent to own all writes explicitly, enable strict mode:
+
+```php
+'strict' => true,
+```
+
+When strict mode is enabled, `save()` throws before converting or writing any models. You may still call `model()` and persist the returned Eloquent model yourself:
+
+```php
+$model = $expressive->model();
+
+$model->save();
 ```
 
 ## Diagnostics

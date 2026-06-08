@@ -31,6 +31,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Strict Mode
+    |--------------------------------------------------------------------------
+    |
+    | Strict mode prevents Expressive objects from writing application state.
+    | Keep this disabled when Expressive should persist converted models
+    | and supported relationships through its save method.
+    |
+    */
+
+    'strict' => false,
+
+    /*
+    |--------------------------------------------------------------------------
     | Diagnostics
     |--------------------------------------------------------------------------
     |
