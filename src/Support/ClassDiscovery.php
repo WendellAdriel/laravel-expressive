@@ -51,17 +51,17 @@ abstract readonly class ClassDiscovery
      */
     private function classFromFile(SplFileInfo $file, string $appNamespace): ?string
     {
-        $path = $file->getPathname();
-        $appPath = rtrim(app_path(), DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
+        $path = str_replace('\\', '/', $file->getPathname());
+        $appPath = rtrim(str_replace('\\', '/', app_path()), '/').'/';
 
         if (! str_starts_with($path, $appPath)) {
             return null;
         }
 
-        $relative = substr($path, strlen($appPath));
+        $relative = trim(substr($path, strlen($appPath)), '/');
         $class = trim($appNamespace, '\\').'\\'.str_replace(
-            ['/', '\\', '.php'],
-            ['\\', '\\', ''],
+            ['/', '.php'],
+            ['\\', ''],
             $relative,
         );
 
