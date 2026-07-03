@@ -85,6 +85,18 @@ Generate an Expressive class from a model:
 php artisan make:expressive User --model="App\Models\User"
 ```
 
+Generate classes for discovered models in bulk when you want to scaffold a project at once:
+
+```bash
+php artisan expressive:generate --path="app/Models"
+```
+
+Check generated classes for model drift in CI:
+
+```bash
+php artisan expressive:sync --all
+```
+
 The generated class will live in `App\Expressive` by default:
 
 ```php

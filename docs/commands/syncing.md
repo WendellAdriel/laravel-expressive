@@ -2,6 +2,7 @@
 
 - [Introduction](#introduction)
 - [Checking for drift](#checking-for-drift)
+- [Checking every generated class](#checking-every-generated-class)
 - [Understanding reports](#understanding-reports)
 - [Writing safe updates](#writing-safe-updates)
 - [When to update manually](#when-to-update-manually)
@@ -31,6 +32,38 @@ php artisan expressive:sync User \
 
 The command returns a successful exit code when the class is in sync.
 
+## Checking every generated class
+
+Use `--all` to scan the configured Expressive namespace path and check every discovered Expressive class:
+
+```shell
+php artisan expressive:sync --all
+```
+
+This is useful in CI after model changes:
+
+```shell
+php artisan expressive:sync --all --no-interaction
+```
+
+The command discovers classes under `expressive.namespace`, skips non-Expressive classes, resolves each mapped model, and prints a final summary:
+
+```text
+Checked: 12
+In sync: 11
+Drifted: 1
+Missing: 0
+Updated: 0
+```
+
+Pass `--namespace` and `--suffix` when the check should use different lookup rules for one run:
+
+```shell
+php artisan expressive:sync --all --namespace="App\Data" --suffix="Data"
+```
+
+Do not pass a class name or `--model` with `--all`. Those options are for single-class checks.
+
 ## Understanding reports
 
 When drift is detected, the command prints one line per difference. Reports include the difference kind, model class, Expressive class, property, mapped key, expected type, actual type, and a suggestion.
@@ -56,6 +89,14 @@ php artisan expressive:sync User --model="App\Models\User" --write
 ```
 
 Write mode replaces the class only when Expressive determines that the existing file is still safe to regenerate. This is intended for generated classes that have not been meaningfully edited by hand.
+
+You may combine `--write` with `--all` when you want CI or a local refactor to rewrite every safe generated class:
+
+```shell
+php artisan expressive:sync --all --write
+```
+
+The command still refuses unsafe rewrites and returns a failing exit code when drift remains, a mapped model cannot be resolved, or a customized class needs manual review.
 
 ## When to update manually
 
