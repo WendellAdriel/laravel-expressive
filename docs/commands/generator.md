@@ -2,6 +2,7 @@
 
 - [Introduction](#introduction)
 - [Generating a class](#generating-a-class)
+- [Generating many classes](#generating-many-classes)
 - [Choosing the target class](#choosing-the-target-class)
 - [Selecting attributes](#selecting-attributes)
 - [Selecting relationships](#selecting-relationships)
@@ -29,6 +30,41 @@ With the default configuration, the generated file is written to `app/Expressive
 
 If the model option is omitted, the command asks which model should be mapped.
 
+## Generating many classes
+
+Use `expressive:generate` when you want Expressive to scan model paths and generate classes in bulk:
+
+```shell
+php artisan expressive:generate
+```
+
+By default, the command scans `app/Models`. You may pass one or more explicit app-relative paths:
+
+```shell
+php artisan expressive:generate --path="app/Models" --path="app/Domain/Billing/Models"
+```
+
+The command only generates classes for discovered PHP classes that extend `Illuminate\Database\Eloquent\Model`. Non-PHP files and non-model classes are skipped.
+
+Use `--exclude` to skip a model basename or fully qualified class name:
+
+```shell
+php artisan expressive:generate --exclude="AuditLog" --exclude="App\Models\LegacyUser"
+```
+
+Bulk generation reuses the same generator options as `make:expressive`, including namespace, suffix, attribute selection, relationship selection, hidden attribute handling, morph map hints, dry runs, and force overwrites:
+
+```shell
+php artisan expressive:generate \
+    --path="app/Models" \
+    --namespace="App\Data" \
+    --suffix="Data" \
+    --without-relationships \
+    --dry-run
+```
+
+The command refuses to overwrite existing files unless `--force` is passed. It returns a failing exit code when any discovered model cannot be generated.
+
 ## Choosing the target class
 
 You may override the namespace or suffix for a single generation run:
@@ -40,7 +76,7 @@ php artisan make:expressive User \
     --suffix="Expressive"
 ```
 
-This writes `App\Data\UserExpressive`. These options override `expressive.namespace` and `expressive.suffix` only for the current command.
+This writes `App\Data\UserExpressive`. These options override `expressive.namespace` and `expressive.suffix` only for the current command. The same options are available on `expressive:generate` and apply to every generated class.
 
 ## Selecting attributes
 
@@ -120,7 +156,7 @@ Use `--dry-run` to print the generated class without writing a file:
 php artisan make:expressive User --model="App\Models\User" --dry-run
 ```
 
-The command refuses to overwrite an existing class unless `--force` is passed:
+The single-class and bulk generators refuse to overwrite an existing class unless `--force` is passed:
 
 ```shell
 php artisan make:expressive User --model="App\Models\User" --force

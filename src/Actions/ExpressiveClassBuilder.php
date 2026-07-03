@@ -17,17 +17,20 @@ use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
+use WendellAdriel\Expressive\DTOs\GenerateExpressiveClassOptions;
 use WendellAdriel\Expressive\Exceptions\UnsupportedGenerationException;
 
 final readonly class ExpressiveClassBuilder
 {
     public function __construct(private CastTypeResolver $castTypeResolver) {}
 
-    /**
-     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool, hint_morph_map?: bool}  $options
-     */
-    public function handle(string $stub, string $namespace, string $class, Model $model, array $options = []): string
-    {
+    public function handle(
+        string $stub,
+        string $namespace,
+        string $class,
+        Model $model,
+        GenerateExpressiveClassOptions $options = new GenerateExpressiveClassOptions,
+    ): string {
         $properties = $this->propertiesFor($namespace, $model, $options);
 
         $modelAlias = class_basename($model).'Model';
@@ -46,17 +49,16 @@ final readonly class ExpressiveClassBuilder
     }
 
     /**
-     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool, hint_morph_map?: bool}  $options
      * @return array{imports: string, properties: string}
      */
-    private function propertiesFor(string $namespace, Model $model, array $options): array
+    private function propertiesFor(string $namespace, Model $model, GenerateExpressiveClassOptions $options): array
     {
         $imports = [
             'WendellAdriel\\Expressive\\Expressive',
         ];
         $properties = [];
         $columns = $model->getConnection()->getSchemaBuilder()->getColumns($model->getTable());
-        $hidden = (bool) ($options['exclude_hidden'] ?? false) ? $model->getHidden() : [];
+        $hidden = $options->excludeHidden ? $model->getHidden() : [];
         $columnNames = array_column($columns, 'name');
         $virtualAttributes = $this->virtualAttributesFor($model, $columnNames);
         $selectedAttributes = $this->selectedAttributesFor($model, $columnNames, $virtualAttributes, $options);
@@ -74,7 +76,7 @@ final readonly class ExpressiveClassBuilder
         }
 
         foreach ($this->filteredRelationshipsFor($model, $options) as $relationship) {
-            $properties[] = $this->relationshipProperty($namespace, $model, $relationship, $imports, (bool) ($options['hint_morph_map'] ?? false));
+            $properties[] = $this->relationshipProperty($namespace, $model, $relationship, $imports, $options->hintMorphMap);
         }
 
         foreach ($virtualAttributes as $attribute) {
@@ -148,17 +150,16 @@ final readonly class ExpressiveClassBuilder
     }
 
     /**
-     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool, hint_morph_map?: bool}  $options
      * @return list<array{name: string, type: string, related: class-string<Model>|null}>
      */
-    private function filteredRelationshipsFor(Model $model, array $options): array
+    private function filteredRelationshipsFor(Model $model, GenerateExpressiveClassOptions $options): array
     {
-        if ((bool) ($options['without_relationships'] ?? false)) {
+        if ($options->withoutRelationships) {
             return [];
         }
 
         $relationships = $this->relationshipsFor($model);
-        $only = $options['relationships'] ?? null;
+        $only = $options->relationships;
 
         if ($only === null) {
             return $relationships;
@@ -180,16 +181,15 @@ final readonly class ExpressiveClassBuilder
     /**
      * @param  list<string>  $columns
      * @param  list<string>  $virtualAttributes
-     * @param  array{without_attributes?: bool, attributes?: list<string>|null, without_relationships?: bool, relationships?: list<string>|null, exclude_hidden?: bool, hint_morph_map?: bool}  $options
      * @return list<string>|null
      */
-    private function selectedAttributesFor(Model $model, array $columns, array $virtualAttributes, array $options): ?array
+    private function selectedAttributesFor(Model $model, array $columns, array $virtualAttributes, GenerateExpressiveClassOptions $options): ?array
     {
-        if ((bool) ($options['without_attributes'] ?? false)) {
+        if ($options->withoutAttributes) {
             return [];
         }
 
-        $only = $options['attributes'] ?? null;
+        $only = $options->attributes;
 
         if ($only === null) {
             return null;

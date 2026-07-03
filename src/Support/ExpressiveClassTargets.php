@@ -53,19 +53,22 @@ final class ExpressiveClassTargets
 
     public function pathFor(string $appNamespace, string $namespace, string $class): string
     {
+        return $this->directoryFor($appNamespace, $namespace).'/'.$class.'.php';
+    }
+
+    public function directoryFor(string $appNamespace, string $namespace): string
+    {
         $root = trim($appNamespace, '\\');
 
         if (str_starts_with($namespace, $root)) {
-            $relative = Str::after($namespace, $root);
-
-            return app_path(str_replace('\\', '/', $relative).'/'.$class.'.php');
+            return app_path(str_replace('\\', '/', Str::after($namespace, $root)));
         }
 
         if (str_starts_with($namespace, 'App\\')) {
-            return app_path(str_replace('\\', '/', Str::after($namespace, 'App\\')).'/'.$class.'.php');
+            return app_path(str_replace('\\', '/', Str::after($namespace, 'App\\')));
         }
 
-        return base_path(str_replace('\\', '/', $namespace).'/'.$class.'.php');
+        return base_path(str_replace('\\', '/', $namespace));
     }
 
     /**

@@ -15,9 +15,31 @@ use WendellAdriel\Expressive\Tests\Fixtures\Models\User;
 beforeEach(function (): void {
     File::deleteDirectory(app_path('Expressive'));
     File::deleteDirectory(app_path('Data'));
+    File::deleteDirectory(app_path('Models/BulkExpressive'));
+    File::deleteDirectory(app_path('Models/DefaultBulkExpressive'));
+    File::deleteDirectory(app_path('GeneratedExpressive'));
     File::deleteDirectory(base_path('stubs'));
     Relation::morphMap([], false);
 });
+
+function createBulkGenerationModel(string $class, string $extends, string $directory): void
+{
+    $namespace = 'App\\'.str_replace('/', '\\', $directory);
+    $path = app_path($directory."/{$class}.php");
+
+    File::ensureDirectoryExists(dirname($path));
+    File::put($path, <<<PHP
+<?php
+
+declare(strict_types=1);
+
+namespace {$namespace};
+
+final class {$class} extends \\{$extends}
+{
+}
+PHP);
+}
 
 afterEach(function (): void {
     Relation::morphMap([], false);
@@ -497,4 +519,118 @@ it('generates property types for documented casts and falls back to mixed for cu
         ->and($contents)->toContain('public ?CastValueObject $typedCustomValue = null;')
         ->and($contents)->toContain('public mixed $malformedCustomValue = null;')
         ->and($contents)->toContain('public mixed $castableValue = null;');
+});
+
+it('generates expressive classes for discovered models in an explicit path', function (): void {
+    createBulkGenerationModel('BulkUser', User::class, 'Models/BulkExpressive');
+    createBulkGenerationModel('BulkPost', User::class, 'Models/BulkExpressive');
+    File::put(app_path('Models/BulkExpressive/readme.txt'), 'ignore me');
+
+    $result = Artisan::call('expressive:generate', [
+        '--path' => ['app/Models/BulkExpressive'],
+        '--namespace' => 'App\\GeneratedExpressive',
+        '--without-relationships' => true,
+    ]);
+    $output = Artisan::output();
+
+    expect($result)->toBe(0)
+        ->and(app_path('GeneratedExpressive/BulkUser.php'))->toBeFile()
+        ->and(app_path('GeneratedExpressive/BulkPost.php'))->toBeFile()
+        ->and(File::get(app_path('GeneratedExpressive/BulkUser.php')))->toContain('final class BulkUser extends Expressive')
+        ->and($output)->toContain('Discovered: 2')
+        ->and($output)->toContain('Generated: 2');
+});
+
+it('uses app models as the default bulk discovery path', function (): void {
+    createBulkGenerationModel('DefaultBulkUser', User::class, 'Models/DefaultBulkExpressive');
+
+    $result = Artisan::call('expressive:generate', [
+        '--namespace' => 'App\\GeneratedExpressive',
+        '--without-relationships' => true,
+    ]);
+
+    expect($result)->toBe(0)
+        ->and(app_path('GeneratedExpressive/DefaultBulkUser.php'))->toBeFile();
+});
+
+it('applies namespace suffix excludes dry runs and force during bulk generation', function (): void {
+    createBulkGenerationModel('BulkUser', User::class, 'Models/BulkExpressive');
+    createBulkGenerationModel('BulkPost', User::class, 'Models/BulkExpressive');
+
+    $dryRun = Artisan::call('expressive:generate', [
+        '--path' => ['app/Models/BulkExpressive'],
+        '--namespace' => 'App\\GeneratedExpressive',
+        '--suffix' => 'Data',
+        '--exclude' => ['BulkPost'],
+        '--dry-run' => true,
+        '--without-relationships' => true,
+    ]);
+    $output = Artisan::output();
+
+    expect($dryRun)->toBe(0)
+        ->and(app_path('GeneratedExpressive/BulkUserData.php'))->not->toBeFile()
+        ->and($output)->toContain('BulkUserData')
+        ->and($output)->toContain('Skipped: 1');
+
+    Artisan::call('expressive:generate', [
+        '--path' => ['app/Models/BulkExpressive'],
+        '--namespace' => 'App\\GeneratedExpressive',
+        '--suffix' => 'Data',
+        '--exclude' => ['BulkPost'],
+        '--without-relationships' => true,
+    ]);
+
+    File::put(app_path('GeneratedExpressive/BulkUserData.php'), 'existing');
+
+    $withoutForce = Artisan::call('expressive:generate', [
+        '--path' => ['app/Models/BulkExpressive'],
+        '--namespace' => 'App\\GeneratedExpressive',
+        '--suffix' => 'Data',
+        '--exclude' => ['BulkPost'],
+        '--without-relationships' => true,
+    ]);
+
+    expect($withoutForce)->toBe(1)
+        ->and(File::get(app_path('GeneratedExpressive/BulkUserData.php')))->toBe('existing');
+
+    $withForce = Artisan::call('expressive:generate', [
+        '--path' => ['app/Models/BulkExpressive'],
+        '--namespace' => 'App\\GeneratedExpressive',
+        '--suffix' => 'Data',
+        '--exclude' => ['BulkPost'],
+        '--force' => true,
+        '--without-relationships' => true,
+    ]);
+
+    expect($withForce)->toBe(0)
+        ->and(File::get(app_path('GeneratedExpressive/BulkUserData.php')))->toContain('final class BulkUserData extends Expressive');
+});
+
+it('passes generator options through to every bulk generated class', function (): void {
+    createBulkGenerationModel('BulkUser', User::class, 'Models/BulkExpressive');
+
+    Artisan::call('expressive:generate', [
+        '--path' => ['app/Models/BulkExpressive'],
+        '--namespace' => 'App\\GeneratedExpressive',
+        '--attributes' => 'name,email',
+        '--exclude-hidden' => true,
+        '--without-relationships' => true,
+    ]);
+
+    $contents = File::get(app_path('GeneratedExpressive/BulkUser.php'));
+
+    expect($contents)->toContain('public string $name;')
+        ->toContain('public string $email;')
+        ->not->toContain('public ?int $id = null;')
+        ->not->toContain('public ?string $password = null;')
+        ->not->toContain('#[Relationship]');
+});
+
+it('reports missing model discovery paths clearly during bulk generation', function (): void {
+    $result = Artisan::call('expressive:generate', [
+        '--path' => ['app/Models/MissingBulkExpressive'],
+    ]);
+
+    expect($result)->toBe(1)
+        ->and(Artisan::output())->toContain('Model path [app/Models/MissingBulkExpressive] does not exist.');
 });
